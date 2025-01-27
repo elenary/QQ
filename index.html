@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Hello, Quarto</title>
+<title>index</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,63 +23,164 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="hello_files/libs/clipboard/clipboard.min.js"></script>
-<script src="hello_files/libs/quarto-html/quarto.js"></script>
-<script src="hello_files/libs/quarto-html/popper.min.js"></script>
-<script src="hello_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="hello_files/libs/quarto-html/anchor.min.js"></script>
-<link href="hello_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="hello_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="hello_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="hello_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="hello_files/libs/bootstrap/bootstrap-973236bd072d72a04ee9cd82dcc9cb29.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/quarto.js"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="index_files/libs/bootstrap/bootstrap-81e35ebdb4125010edbabe6010586085.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
-<body class="fullcontent">
+<body>
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li><li><a href="index.epub"><i class="bi bi-file"></i>ePub</a></li></ul></div></div>
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Hello, Quarto</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<section id="meet-quarto" class="level2">
-<h2 class="anchored" data-anchor-id="meet-quarto">Meet Quarto</h2>
-<p>Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <a href="https://quarto.org" class="uri">https://quarto.org</a>.</p>
-</section>
-<section id="meet-the-penguins" class="level2">
-<h2 class="anchored" data-anchor-id="meet-the-penguins">Meet the penguins</h2>
-<p><img src="https://raw.githubusercontent.com/quarto-dev/quarto-web/main/docs/get-started/hello/rstudio/lter_penguins.png" class="img-fluid" style="float:right;" alt="Illustration of three species of Palmer Archipelago penguins: Chinstrap, Gentoo, and Adelie. Artwork by @allison_horst." width="401"></p>
-<p>The <code>penguins</code> data from the <a href="https://allisonhorst.github.io/palmerpenguins" title="palmerpenguins R package"><strong>palmerpenguins</strong></a> package contains size measurements for 344 penguins from three species observed on three islands in the Palmer Archipelago, Antarctica.</p>
-<p>The plot below shows the relationship between flipper and bill lengths of these penguins.</p>
-<div class="cell">
+<section id="sample" class="level1">
+<h1>Выборка</h1>
+<!-- Допустим, нас есть какое-то предположение о связи неких психологических конструктов относительно того, как работает психика у людей. Например, о том, что кофеин как-то влияет на такой конструкт, как внимание -- это наша **теоретическая гипотеза**. Чтобы ее проверить, нам нужно провести исследование и уточнить гипотезу на языке этого исследования, сделать ее более конкретной. Например, мы решили провести эксперимент, в котором экспериментальная группа пила 3 кружки кофе в первой половине дня, а контрольная группа пила декофеинизированный кофе. Далее мы делали несколько замеров решения какого-нибудь когнитивного теста на внимание во второй половине дня и смотрели, сколько ошибок допускают экспериментальной и контрольной выборок. десь мы уточнили. И когда мы делаем выводы, мы говорим не о нашей небольшой группе людей, которых мы исследовали – а о всей популяции людей, она называется **генеральной совокупностью**. Почему так можно? -->
+<p>Мы рассмотрели два примера – о влиянии кофеина на внимание и коммуникационного рабочего инструмента на продуктивность. В этих примерах мы предположили, что провели исследование – то есть набрали какое-то количество человек и сделали вывод, как в целом это работает не только у этих человек, а вообще у людей. Почему так происходит? Почему мы можем распространить эти выводы на всех людей, которые теоретически могут пить кофе и воспользоваться этим коммуникационным инструментом? И зачем нам вообще это нужно?</p>
+<p align="center">
+</p><p><em>Изображение с <a href="https://towardsdatascience.com/" class="uri">https://towardsdatascience.com/</a></em></p>
+<p></p>
+<section id="выборочные-оценки" class="level2">
+<h2 class="anchored" data-anchor-id="выборочные-оценки">Выборочные оценки</h2>
+<p>Как мы можем сделать вывод о всех людях в целом? Что мы будем делать, если хотим узнать средний рост людей на всей планете? Будем ли мы измерять каждого человека из почти 8 миллиардов на планете и брать среднее арифметическое?</p>
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="hello_files/figure-html/plot-penguins-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="images/height_distribution.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
 </figure>
 </div>
 </div>
 </div>
+<p align="center">
+</p><p><a href="https://ourworldindata.org/human-height" class="uri">https://ourworldindata.org/human-height</a></p>
+<p></p>
+<p><strong>Генеральная совокупность</strong> – множество (или совокупность) всех изучаемых объектов в рамках определенного исследовательского вопроса.</p>
+<p><strong>Выборка</strong> или <strong>выборочная совокупность</strong> – часть генеральной совокупности, отобранная для изучения определенного исследовательского вопроса.</p>
+<p>Когда мы говорим о генеральной совокупности, мы говорим о ее <strong>параметрах</strong>, например, средний рост людей, обозначим его <strong>X</strong>. Мы не можем посчитать его напрямую, поэтому нам приходится прибегать к <strong>выборочным оценкам</strong>, которые часто обозначются той же буквой, что и параметр генеральной совокупности, только “с крышечкой” или “с чертой” <strong>X̅</strong> – выборочное среднее, средний рост людей на конкретной выборке.</p>
+<p>Итак, когда мы хотим сделать вывод о всех людях из генеральной совокупности – мы проводим исследование на небольшой выборке (в зависимости от метоода исследования необходимый размер выборки может быть от 10 до 1000 чловек) и оцениваем исследуемый параметр генеральной совокупности по выборочным оценкам.</p>
+<p>Чтобы не запутаться, о чем речь, ключевые популяционные и выборочные оценки обозначают по-разному:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 45%">
+<col style="width: 32%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;"></th>
+<th style="text-align: center;">Генеральная совокупность</th>
+<th style="text-align: center;">Выборка</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">Среднее (математическое ожидание)</td>
+<td style="text-align: center;"><span class="math inline">\(\mu\)</span></td>
+<td style="text-align: center;">M, <span class="math inline">\(\overline X\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">Стандартное отклонение</td>
+<td style="text-align: center;"><span class="math inline">\(\sigma\)</span></td>
+<td style="text-align: center;">s, sd</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="репрезентативность-выборки" class="level2">
+<h2 class="anchored" data-anchor-id="репрезентативность-выборки">Репрезентативность выборки</h2>
+<p>Важным понятием является <strong>репрезентативность выборки</strong> – способность выборки отражать исследуемый параметр генеральной совокупности.</p>
+<p><em>Одна и та же выборка может быть репрезентативной для одного исследовательского вопроса и не репрезентативной для другого!</em></p>
+<p>Репрезентативность достигается:</p>
+<ul>
+<li><strong>Случайным выбором людей</strong> (берем не каких-то конкретных, которые нам больше нравятся, а случайным образом)</li>
+<li><strong>Объемом выборки</strong> (доказано, что при большом объеме выборки она достаточно представляет генеральную совокупность, чтобы дать ответ об исследуемом параметре)</li>
+</ul>
+<p><strong>Способы формирования репрезентативных выборок</strong></p>
+<ul>
+<li>Простая случайная выборка (simple random sample)</li>
+<li>Систематическая выборка (systematic sample)</li>
+<li>Стратифицированная выборка (stratified sample)</li>
+<li>Кластерная выборка (cluster sample)</li>
+</ul>
+<p><strong>Простая случайная выборка</strong> набирается из большого количества случайным образом – все элементы генеральной совокупности имеют равные шансы попасть в выборку.</p>
+<p><strong>Систематическая выборка</strong> имитирует случайный выбор и обычно используется социологами в полевых исследованиях, когда задается определенный шаг в выьборе людей: например, каждый 5-й или 10-й человек.</p>
+<p><strong>Стратифицированная выборка</strong> нужна, если на исследуемый нами признак может повлиять какой-то параметр, который распределен в генеральной совокупности неравномерно: например, мы исследуем уровень удовлетворенности жизнью, но при этом знаем, что на него влияет уровень дохода – и нам нужно обеспечить эквивалентное распределение уровня дохода в выборке. Далее уже из этих страт по доходу испытуемые выбираются случайно.</p>
+<p><strong>Кластерная выборка</strong> включает в себя целые отдельные кластеры, без случайного выбора в них: например, мы исследуем школьников, и вместо того, чтобы выбирать их случайно, включим в выборку несколько определенных школ (кластеров)</p>
+</section>
+<section id="dependent_samples" class="level2">
+<h2 class="anchored" data-anchor-id="dependent_samples">Зависимые и независимые выборки</h2>
+<p>Еще одно важное понятие относительно выборок: они могут быть зависимые и независимые.</p>
+<p><strong>Независимые выборки</strong> используются, когда мы сравнениваем между собой группы наблюдений, относящиеся к разным людям (школам / институтам / и тд). Например, в нашем примере с влияением кофеина на внимание мы можем набрать группу людей, которые будут пить по 3 кружки кофе в день, и другую группу – кто будет пить декофеинизированный напиток. Это разные люди, никак не связанные между собой.</p>
+<p>Но если мы бы взяли одно и ту же группу людей, и на одной неделе измеряли их внимание после 3 кружек кофе, а потом <em>на этих же самых людях</em> проверяли, как действует декофеинизированный напиток – это будут уже <strong>зависимые выборки</strong>, так как это все еще те же самые люди.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/samples.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p align="center">
+</p>
+<p><strong>Кейс</strong></p>
+<blockquote class="blockquote">
+<p>Исследователь Никита изучал взаимосвязь возраста, преподавательского стажа и профессионального выгорания преподавателей в университетах. Для этого он выбрал несколько университетов: МГУ, Высшая школа экономики и РАНХиГС. Никита нашел по 10 преподавателей департаметов психологии из каждого вуза в социальной сети ВКонтакте и предлагал им заполнить опросник выгорания Маслач (Maslach Burnout Inventory, MBI). На основании обработанных данных Никита сделал следующие выводы: 1) в России чаще выгорают преподаватели более молодого возраста; 2) чаще выгорают преподаватели с меньшим преподавательским стажем; 3) преподаватели МГУ в целом выгорают меньше, чем преподаватели в ВШЭ. Какие методы набора выборки использовал Никита? Верны ли выводы?</p>
+</blockquote>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/2022-09-13%2009.30.13.jpg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:60.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 
 </main>
