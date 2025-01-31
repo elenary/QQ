@@ -1,0 +1,86 @@
+---
+title: "distributions"
+format:
+  html:
+    theme: cosmo
+    self-contained: true
+---
+
+# Distributions
+
+What is distribution? We use this word all the time.
+
+When speaking about distributions, we mean **the law of distribution of a random variable** – the correspondence between the possible values ​​of this variable from the range of its admissible values ​​and: the probabilities of these values ​​– for a discrete variable, or the probability density – for a continuous variable.
+
+## 5.1 Types of distributions
+
+The laws of probability distributions can not be derived for all quantities! But it so happened that we can describe some patterns, probability distributions, with formulas, as in physics: the force of gravity (the force with which the Earth attracts all bodies) is directly proportional to the mass of the object, taken with the coefficient of acceleration of free fallF=m∗gF=m∗g. We noticed this in relation to the surrounding world and derived a law (not we personally, but representatives of the planet Earth in general). The same is with distributions: we noticed that the probabilities of the distribution of some random variables obey certain laws, and wrote them down. For example, it has been proven that continuous random variables, which are affected by many random factors (for example, height, weight, etc.), are distributed in accordance with **the Gaussian distribution** , also known as **the normal distribution** . Its formula is:
+
+P(x)=e-(x-μ)2/(2σ2)σ√2πP(x)=e-(x-μ)2/(2σ2)σ2π
+
+```         
+plot(dnorm(1:1000, mean = 500, sd = 100))
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-2-1.png)
+
+Or, for example, the exponential distribution:
+
+P(x)=λ×e-λxP(x)=λ×e-λx
+
+```         
+plot(dexp(x = 1:100, rate = 0.1))
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-4-1.png) χ2 distribution:
+
+P(x)=λ×e-λxP(x)=λ×e-λx
+
+```         
+plot(dchisq(1:1000, df=100))
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-5-1.png)
+
+Or, for example, the binomial distribution:
+
+P(k|n,p)=n!k!(n-k)!×pk×(1-p)n-k=(nk)×pk×(1-p)n-kP(k|n,p)=n!k!(n-k)!×pk×(1-p)n-k=(nk)×pk×(1-p)n-k
+
+```         
+plot(dbinom(1:100, size=100, prob=0.5))
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-6-1.png) You can look and be horrified here <http://www.math.wm.edu/~leemis/chart/UDR/UDR.html> . Fortunately, we won't need any of this.
+
+Less scary version <https://www.johndcook.com/blog/distribution_chart/#normal>
+
+## 5.2 Distribution functions
+
+Above we got acquainted with probability density, let's record all the functions applicable to probability that are useful:
+
+-   **probability density function** for continuous variables (e.g. height, weight) and **probability mass function** for discrete variables (e.g. number of cases) – the simplest basic function, often denoted by the letter`d*`
+
+-   **cumulative distribution function / probability density function** for continuous variables, often denoted by the letter`p*`
+
+-   **quantile function** , also known as the inverse cumulative distribution density function (more on that later), is often denoted by the letter `q*` **probability density function (cumulative distribution function; cdf)**
+
+Why are they needed?
+
+Let's look at the example of IQ tests.
+
+**Probability density function**
+
+```         
+iq <- seq(50,150, 0.1)
+plot(iq, dnorm(iq, mean = 100, sd = 15))
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-7-1.png)
+
+**Cumulative distribution function (cdf)**
+
+```         
+plot(iq, pnorm(iq, mean = 100, sd = 15))
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-8-1.png)
