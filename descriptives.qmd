@@ -1,0 +1,443 @@
+---
+title: "descriptive"
+format:
+  html:
+    theme: cosmo
+    self-contained: true
+---
+
+# Descriptive statistics
+
+```{r, eval=TRUE, echo = FALSE, message = FALSE}
+library(tidyverse)
+library(kableExtra)
+```
+
+We now turn to a discussion of the first of the two types of statistics, **descriptive statistics .** When we talk about descriptive statistics, we are always talking about empirically obtained data, not about the population. To say anything about the population, we need to deal with inferential statistics, but for now we will stick with empirically obtained data and sample distributions.
+
+Why do we need descriptive statistics? We discussed that descriptive statistics:
+
+-   describes the data: we examine the variables themselves, look at the data on them and get to know them better
+
+-   allows you to replace a set of data with individual numbers - this is often easier to understand and more intuitive than looking at a table of values
+
+If it so happens that our collected data represents the entire general population, then we do not even need to engage in inferential statistics - we can draw some conclusions about this data from empirically collected data (for example, compare the performance in class A and B of just one school)
+
+## Descriptive Visualizations
+
+We have already discussed two important graphs – the histogram and the probability density plot – when we talked about distributions. These graphs are worth making whenever we want to explore empirically obtained data using descriptive statistics. There seems to be no official term for this, but I also call these graphs descriptive.
+
+For example, we built them for data on emotional burnout:
+
+```{r, eval=TRUE, echo = FALSE, message = FALSE}
+teacher_number <- seq(1,30,1)
+age <-  sample(22:60, size = 30, replace = T)
+exp_years <- sample(1:8, size = 30, replace = T)
+exp_scaled <- ifelse(exp_years >= 1 & exp_years <= 2, "от 1 до 2",
+                     ifelse(exp_years > 2 & exp_years <= 5, "от 3 до 5",
+                            ifelse(exp_years > 5, "больше 5", exp_years)))
+burnout_MBI <- sample(19:70, size = 30, replace = T)
+univer <-  rep(c("MSU", "HSE", "MSU", "RANEPA", "HSE", "RANEPA"),5)
+burnout <- tibble(teacher_number, age, exp_years, exp_scaled, burnout_MBI, univer)
+```
+
+To visualize the ordinal variable Teaching Experience *exp_scaled*
+
+```{r}
+burnout %>% 
+  ggplot(aes(x=exp_scaled)) +
+  geom_bar() +
+  theme_minimal()
+```
+
+To visualize the quantitative variable *Age* (ratio scale)
+
+```{r}
+burnout %>% 
+  ggplot(aes(x=age)) +
+  geom_density() +
+  theme_minimal()
+```
+
+Distribution graphs, in fact, already give us a lot - at least an understanding of what family of distributions a variable may belong to, and what the distribution properties of these data are. When talking about the properties of graphs, there are usually two.
+
+**The asymmetry coefficient, or “skewness”,** is an indicator of the symmetry of the graph: if the graph is symmetrical6, this indicator is equal to 0; if not, it has a value different from zero in the direction in which the graph is skewed.
+
+-   If the asymmetry coefficient is positive,S>0S>0– they talk about **right-sided assimilation** (the right side is more elongated than the left).
+
+-   If the asymmetry coefficient is negative,S<0S<0– they talk about **left-sided assimilation** (the left side is more elongated than the right).
+
+**Excess, “stretching” (kurtosis)** is an indicator of how much the graph is stretched upward or “flattened” along the abscissa axis.
+
+```{r echo=F, out.width="125%" }
+knitr::include_graphics("images/Illustration.jpeg")
+```
+
+## Measures of Central Tendency {#ctm}
+
+Measures of central tendency are descriptive statistics that tell you something about the “center of mass” of a distribution: where is its center, where is the most data in this distribution? This can be very useful in applied questions.
+
+> Let's imagine that we are interested in the question: what is the well-being of Russians? Has it changed from 2008 to 2022, and if so, how? How can we answer this question? ( *let's imagine that we have access to real data of all Russians collected on this issue, and there is no need to make a statistical conclusion on a small sample* )
+
+Let's say we evaluate well-being by annual per capita income. The first thing that comes to mind is to calculate the average income in 2008 and in 2022 and see how they differ. Will this be the right calculation? Most likely, not.
+
+The point is that per capita income is a very uneven indicator (variable). <https://ru.wikipedia.org/wiki/%D0%9A%D0%BE%D1%8D%D1%84%D1%84%D0%B8%D1%86%D0%B8%D0%B5%D0%BD%D1%82_%D0%94%D0%B6%D0%B8%D0%BD%D0%B8>
+
+### Mean, median, mode
+
+**The arithmetic mean (mean)** is the sum of all values divided by the number of observations. It is calculated using the formula 
+
+$\bar X = \dfrac{\sum_{i=1}^{n}x_i}{n}$
+
+For example, we have a data set:
+
+```{r echo = F}
+set.seed(42)
+sample_data1 <- sample(1:50, 11)
+sample_data1
+```
+
+Its average
+
+```{r}
+mean(sample_data1)
+```
+
+**Properties of the average**
+
+It is useful to remember the properties of the average:
+
+1.  If you add (or subtract) the same number to each sample value, the average will also increase (or decrease) by the same number:¯$\bar X_(x_i+c) = \bar X + c$
+
+2.  If each sample value is multiplied (or divided) by the same number, then the average will also increase (or decrease) by the same number of times.¯$\bar X_(x_i \times c) = \bar X \times c$
+
+3.  The sum of all deviations from the mean is zero. $\sum_{i=1}^{n}(\bar X - x_i) = 0$
+
+
+**The median** is the boundary that divides an ordered set of data into two. To calculate the median, we need to: 1) arrange all the available values in ascending order; 2) find the middle: this will be either the value corresponding to the place $\frac{n}{2}+1$, if n is odd, or the average of two central values $(\frac{1}{2}(X_{n/2}+X_{n+1})/2$, if n is even.
+
+```{r}
+sort(sample_data1)
+median(sample_data1)
+```
+
+```{r echo = F}
+sample_data2 <- sample(1:50, 10)
+sample_data2
+```
+
+```{r}
+sort(sample_data2)
+median(sample_data2)
+```
+
+In practice, we rarely encounter data where each value is presented only once – we have already discussed at length that in statistics we work with probabilities and frequencies. Therefore, in reality, we must remember that we are not halving the values ​​themselves, as in the case of the average – but *the distribution* of values. In a histogram or probability density graph, the median is a line that divides the graph into two equal parts: the same number of data (values ​​taken with their frequencies) should remain on the left and right.
+
+```{r}
+burnout %>% 
+  ggplot(aes(x=exp_years)) +
+  geom_histogram(binwidth = 1) +
+  geom_vline(xintercept = median(exp_years)) +
+  theme_minimal()
+```
+
+**Mode** is the value of a feature that occurs more often than others.
+
+On the histogram, the mode will always be on the highest bar, and on the probability density graph – at its peak *(or very, very close to it – remember that the probability density graph is a trick, where we draw each point as if “taking” its neighborhood with us, therefore, depending on the size of the neighborhood, the median may drift a little from the peak, but this is a tiny deviation)*
+
+```{r mode_function, include=FALSE}
+# mode function
+mode <- function(x) {
+  sort(unique(x))[which.max(table(x))]
+}
+```
+
+Weighted average.
+
+Square mean.
+
+### Features of use
+
+In the welfare valuation example, we found that the mean is a poor choice for describing these data using measures of central tendency. So which measures of central tendency should we choose?
+
+| **Measure of CT** | **Data and scale** | **Features of use** |
+|----|----|----|
+| Average | Quantitative only: ratio or interval scale | a fairly large sample, the distribution is symmetrical, there are no noticeable outliers |
+| Median | Quantitative or ordinal: ratio scale, interval or ordinal (rank) scale | we can use it when the distribution is not symmetrical, there are outliers, we cannot use it for the nominative scale |
+| Fashion | Any scale, Nominal, Ordinal, Quantitative (ratio or interval) | most often used where we cannot perform metric operations, but cannot accurately calculate the mode for continuous quantities |
+
+```{r central_tendency_sampling,include=FALSE}
+set.seed(108)
+symm<-sample(x=seq(1,10,0.5),size=600,replace=TRUE, prob=c(.05,.05,.07,.1,.1,.15,.20,.30,.35,.5,.35,.30,.20,.15,.1,.1,.07,.05,.05))
+asymm_right<-sample(
+x=seq(1,10,0.5),
+size=600,
+replace=TRUE,
+prob=c(.1,.2,.25,.4,.5,.5,.4,.35,.3,.25,.2,.25,.2,.15,.1,.1,.07,.05,.05))
+asymm_left<-sample(
+x=seq(1,10,0.5),
+size=600,
+replace=TRUE,
+prob=c(.03,.05,.07,.1,.15,.15,.2,.2,.25,.25,.3,.35,.5,.5,.4,.4,.25,.2,.2))
+bimodal<-sample(
+x=seq(1,10,0.5),
+size=600,
+replace=TRUE,
+prob=c(.05,.05,.07,.1,.1,.2,.3,.35,.3,.15,.1,.15,.20,.40,.50,.25,.1,.05,.05))
+
+colors<-c("Mean"="red4","Median"="blue4","Mode"="green4")
+```
+
+*Where is the mean, median and mode on the graphs?*
+
+```{r central_tendency_symm, echo=FALSE, warning=FALSE, message=FALSE}
+
+ggplot(NULL, aes(symm)) +
+  geom_histogram(aes(y = ..density..), alpha =.5, binwidth = .5) +
+  geom_density() +
+  geom_vline(xintercept = mean(symm), color = colors['Mean']) +
+  geom_vline(xintercept = median(symm), color = colors['Median']) +
+  geom_vline(xintercept = mode(symm)-0.04, color = colors['Mode']) +
+  labs(x = 'Value',
+       y = 'Density') +
+  theme_minimal()
+```
+
+```{r central_tendency_asymm_right, echo=FALSE}
+ggplot(NULL, aes(asymm_right)) +
+  geom_histogram(aes(y = ..density..), alpha =.5, binwidth = .5) +
+  geom_density() +
+  geom_vline(xintercept = mean(asymm_right), color = colors['Mean']) +
+  geom_vline(xintercept = median(asymm_right), color = colors['Median']) +
+  geom_vline(xintercept = mode(asymm_right)-0.04, color = colors['Mode']) +
+  labs(x = 'Value',
+       y = 'Density') +
+  theme_minimal()
+```
+------------------------------------------------------------------------
+
+We have come close to the concepts that can be (and we will be) directly applied to the data. To make these concepts close to reality, we will take a real dataset (collected data) on which we will work further. As an example, we will take a dataset from kaggle <https://www.kaggle.com/datasets/uciml/student-alcohol-consumption> . This is data from two Portuguese schools (more likely colleges) with detailed socio-demographic information about students, including how they study in mathematics and Portuguese and how often they drink alcohol. I took this dataset, because it contains variables of different types of data on different scales (both a relationship scale, such as age, and an ordinal scale, such as ratings of mother's or father's education or support in the family).
+
+```{r, eval=TRUE, echo = FALSE, message = FALSE}
+library(tidyverse)
+studens_mat <- read_csv("student-mat.csv") %>% 
+  rename_with(., ~ paste0(., "_mat"), .cols = c(absences, paid, G1, G2, G3)) -> studens_mat 
+studens_por <- read_csv("student-por.csv") %>% 
+  rename_with(., ~ paste0(., "_por"), .cols = c(absences, paid, G1, G2, G3)) -> studens_por
+studens_mat %>% 
+  full_join(studens_por, by = c("school","sex","age","address","famsize","Pstatus","Medu","Fedu",
+                             "Mjob","Fjob","reason", "guardian", "traveltime","studytime", "failures", "schoolsup", "famsup",
+                             "activities", "nursery", "higher", "internet", "romantic", "famrel", "freetime", "goout", 
+                             "Dalc", "Walc", "health")) -> students 
+
+students %>% 
+  mutate("student" = paste0("id", row_number()), .before = "school")  %>% 
+  drop_na() %>% 
+  mutate(G_mat = rowMeans(dplyr::select(., c(G1_mat, G2_mat, G3_mat))),
+         G_por = rowMeans(dplyr::select(., c(G1_por, G2_por, G3_por)))) %>% 
+  mutate(ansences_mat_groups = ifelse(absences_mat <=5, "less", ifelse(absences_mat <=15, "middle", "more"))) %>% 
+  mutate(ansences_por_groups = ifelse(absences_por <=5, "less", ifelse(absences_por <=15, "middle", "more"))) -> students-> students
+```
+
+```{r}
+kable(students[1:10,]) %>% scroll_box(width = "100%") 
+```
+
+```{r}
+students %>% 
+  ggplot(aes(x=age)) +
+  geom_histogram(binwidth = 1) +
+  geom_density(aes(x = age)) +
+  theme_minimal()
+```
+
+
+```{r}
+table(students$age)
+prop.table(table(students$age))
+# round(prop.table(table(students$age, students$Walc), 1), 2)
+```
+
+
+```{r}
+mean(students$age)
+```
+```{r}
+median(students$age)
+```
+```{r}
+mode(students$age)
+```
+
+
+```{r}
+students %>% 
+  ggplot(aes(x=G_mat)) +
+  geom_density() +
+  theme_minimal()
+```
+```{r}
+mean(students$G_mat)
+```
+
+```{r}
+median(students$G_mat)
+```
+
+
+```{r}
+table(students$Mjob)
+prop.table(table(students$Mjob))
+mode(students$Mjob)
+```
+## Quantiles, quartiles and percentiles
+
+We have found out that the median divides the distribution in half. This is convenient. For example, to estimate below / above what value the first or second half of the data is.
+
+These questions come up quite often, and not just about half of the data, but about specific chunks of data. **Quantiles** are a general term for points that divide a distribution into equal chunks of data—say, ten percent chunks.
+
+**Deciles** are special cases of quantiles, 9 points that divide the entire distribution into 10 equal parts. Thus, each part contains 10% of the data.
+
+**Percentiles** are special cases of quantiles, 99 points that divide the entire distribution into 100 equal parts, so that each part contains 1% of the data.
+
+**Quartiles** are special cases of quantiles, they divide the entire distribution into four parts, 25% of the data each. That is, there are 4 quartiles in total, and they are designated by the letter Q: Q1, Q2, Q3, Q4.
+
+It turns out that:
+
+-   to the left of the first (lower) quartileQ1Q125% of observations are
+
+-   to the left of the second (middle) quartile (median)Q2Q250% of observations lie
+
+-   to the left of the third (upper) quartileQ3Q375% of observations are
+
+```         
+knitr::include_graphics("docs/images/quartiles-2.png")
+```
+```{r fig.align = 'center', out.width="60%"}
+knitr::include_graphics("images/quartiles-2.png")
+```
+## Measures of variability (variability)
+
+In addition to measures of central tendency, there are measures of variability, also known as measures of changeability or dispersion. Variability is the variability of values, how much the data differs from observation to observation within the sample.
+
+> Let's say you find that your red blood cell count is 3.8\*10, while the norm is 4\*10. How big of a deviation is this?
+
+Why do we need them? Isn't it enough to use measures of central tendency to describe a distribution? No, it's not enough. While measures of central tendency show where our data tends to be, where their "center of mass" is, that is, what single number can characterize our data in general - measures of variability show how much spread there is in our data, how close each of our observations lies to the mean?
+
+Measures of central tendency may coincide although measures of variability differ significantly, for example
+
+```{r distributions_with_the_same_means_generation, echo=F}
+set.seed(123)
+tibble(id = 1:100,
+       x1 = rnorm(100, mean = 2, sd = 1),
+       x2 = rnorm(100, mean = 2, sd = 3),
+       x3 = rnorm(100, mean = 2, sd = 0.5)) -> rnorm_three
+la <- c(x1 = "Variable 1", x2 = "Variable 2", x3 = "Variable 3")
+rnorm_three %>% 
+  pivot_longer(cols = c("x1", "x2", "x3")) %>% 
+  ggplot(aes(value)) +
+  geom_histogram(binwidth = .5) +
+  facet_wrap(~ name,
+             labeller = labeller(name = la)) +
+  labs(x = "Value",
+       y = "Count") +
+  scale_x_continuous(breaks = -5:15) +
+  theme_minimal()
+```
+
+[Images from Anton Angelhardt's textbook](https://angelgardt.github.io/SFDA2022/book/variation.html)
+
+These distributions are very different, but~~they are together after all~~if you look at their averages, they will be the same
+
+```{r distributions_with_the_same_means_generation-2, echo=F}
+set.seed(123)
+tibble(id = 1:100,
+       x1 = rnorm(100, mean = 2, sd = 1),
+       x2 = rnorm(100, mean = 2, sd = 3),
+       x3 = rnorm(100, mean = 2, sd = 0.5)) -> rnorm_three
+la <- c(x1 = "Variable 1", x2 = "Variable 2", x3 = "Variable 3")
+rnorm_three %>% 
+  pivot_longer(cols = c("x1", "x2", "x3")) %>% 
+  ggplot(aes(value)) +
+  geom_histogram(binwidth = .5) +
+  stat_summary(aes(xintercept = ..x.., y = 0), fun = mean, geom = "vline", orientation = "y") +
+  facet_wrap(~ name,
+             labeller = labeller(name = la)) +
+  labs(x = "Value",
+       y = "Count") +
+  scale_x_continuous(breaks = -5:15) +
+  theme_minimal()
+```
+### Range, standard deviation and variance
+
+**Range** is the difference between the maximum and minimum values in a sample $x_{max}-x_{min}$
+
+```{r}
+sample_data1
+range(sample_data1)
+```
+
+Here are the minimum and maximum values, to calculate the range, you need to subtract the minimum from the maximum. And as you can see, the range is very sensitive to outliers - if you add the value "3000" to this sample, the range will change dramatically.
+
+We have already heard about standard deviation (at least, it appears in the formula of normal distribution). Now let's get to know it better and try to derive it.
+
+Since if we calculate the deviation of each observation from the mean and try to average them, we will get zero, we need a different approach to estimating the deviation. If we want to get rid of the problem of getting zero, we usually have two options: take the values ​​by module or square them. To obtain an estimate of the deviation, we used the second option and introduced another important measure of variability for - **variance** .
+
+**Variance** is a measure of variability, which is the square of the standard deviation and is calculated using the formula $D = \dfrac{\sum_{i=1}^{n}(x_i - \bar x)^2}{n}$
+
+The greater the variability in the data, the greater (proportional to the square of the deviations) the dispersion.
+
+An important point is the formula for the dispersion for the general population. For sample dispersion, the number of degrees of freedom is reduced by one, so the formula will take the following form $D = \dfrac{\sum_{i=1}^{n}(x_i - \bar x)^2}{n-1}$
+
+**Standard deviation, also known as root mean square deviation** , is the average deviation of observations from their mean. It is calculated as the square root of the variance: $sd = \sqrt{\dfrac{\sum_{i=1}^{n}(x_i - \bar x)^2}{n-1}}$
+
+**Properties of variance and standard deviation**
+
+Just like the mean, there are important properties for the variance/standard deviation
+
+1.  If the same number (constant) is added (or subtracted) from each sample value  $c$, then the dispersion and standard deviation will not change: $D_(x_i+c) = D$, $sd_(x_i+c) = sd$
+
+2.  If each sample value is multiplied (or divided) by the same numbercc, then the dispersion will increase (decrease) in $c^2$ times $D_(x_i \times c) = D \times c^2$, and the average will increase (or decrease) in $c$ times: $sd_(x_i \times c) = sd \times c$
+
+3.  If the values ​​of two samples do not differ from each other, then they have equal variance and standard deviation
+
+Using student data as an example:
+
+```{r}
+range(students$age)
+range(students$G_mat)
+range(students$Walc)
+range(students$Mjob)
+```
+
+```{r}
+sd(students$age)
+sd(students$G_mat)
+sd(students$Walc)
+```
+
+**Interquartile range**
+
+## Boxplot and Violinplot
+<p align="center"> 
+```{r fig.align = 'center', out.width="60%"}
+# knitr::include_graphics("docs/images/Boxplot_vs_PDF.png")
+```
+</p>
+
+<p align="center"> 
+```{r fig.align = 'center', out.width="60%"}
+# knitr::include_graphics("docs/images/boxplots_hist.png")
+```
+</p>
+
+
+```{r, eval=TRUE}
+library(viridis)
+students %>% 
+  ggplot(aes(x=ansences_mat_groups, y = G_mat)) +
+  geom_violin(aes(fill = ansences_mat_groups)) +
+  geom_boxplot(aes(fill = ansences_mat_groups), width=.1) +
+  scale_fill_viridis(discrete=TRUE) +
+  theme_minimal()
+```

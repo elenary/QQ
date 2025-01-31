@@ -21,6 +21,8 @@ book:
   chapters:
     - index.qmd
     - scales.qmd
+    - distributions.qmd
+    - descriptives.qmd
 
 
 format:
