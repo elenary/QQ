@@ -63,11 +63,11 @@ Different scales have different **measuring power** – the precision with which
 There are 4 scales in total, if you arrange them from bottom to top according to measuring power: names, ordinal, interval, ratios.
 
 | **Scale** | **Description** | **Possible operations** | **Examples** |
-|------------------|------------------|------------------|------------------|
+|----|----|----|----|
 | **Ration** | Quantitative, there is absolute zero, you can calculate *how much* more or less, and *how many times* | =, ≠≠, \>, \<, +, -, ×, ÷ | Height, weight, number of cases |
 | **Interval** | Quantitative, but there is no absolute zero, you can calculate *how much* more or less, but you can't calculate *how many times* | =,≠≠, \>, \<, +, - | Temperature in degrees Celsius, timekeeping according to different calendars |
 | **Ordinal (rank)** | Categorical (qualitative), you can set “more” or “less”, but you can’t calculate quantitatively how much more or less | =, ≠≠, \>, \< | Education level, neuroticism level, sports rating |
-|  **Nominal** | Categorical (qualitative), cannot be set to “more” or “less” | =,≠≠ | Gender, color, place of residence, name of university |
+| **Nominal** | Categorical (qualitative), cannot be set to “more” or “less” | =,≠≠ | Gender, color, place of residence, name of university |
 
 ## 3.4 Continuous and discrete data
 
