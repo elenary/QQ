@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>3&nbsp; distributions – Qualitative and Quantitative Research Methods in Psychology</title>
+<title>3&nbsp; Distributions – Qualitative and Quantitative Research Methods in Psychology</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -4951,6 +4951,12 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">descriptive</span></span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./r_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Introduction to Data Analysis in R</span></span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -4961,11 +4967,8 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#distributions" id="toc-distributions" class="nav-link active" data-scroll-target="#distributions"><span class="header-section-number">4</span> Distributions</a>
-  <ul class="collapse">
-  <li><a href="#types-of-distributions" id="toc-types-of-distributions" class="nav-link" data-scroll-target="#types-of-distributions"><span class="header-section-number">4.1</span> 5.1 Types of distributions</a></li>
-  <li><a href="#distribution-functions" id="toc-distribution-functions" class="nav-link" data-scroll-target="#distribution-functions"><span class="header-section-number">4.2</span> 5.2 Distribution functions</a></li>
-  </ul></li>
+  <li><a href="#types-of-distributions" id="toc-types-of-distributions" class="nav-link active" data-scroll-target="#types-of-distributions"><span class="header-section-number">3.1</span> 5.1 Types of distributions</a></li>
+  <li><a href="#distribution-functions" id="toc-distribution-functions" class="nav-link" data-scroll-target="#distribution-functions"><span class="header-section-number">3.2</span> 5.2 Distribution functions</a></li>
   </ul>
 </nav>
     </div>
@@ -4974,7 +4977,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">distributions</span></h1>
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Distributions</span></h1>
 </div>
 
 
@@ -4991,12 +4994,10 @@ window.Quarto = {
 </header>
 
 
-<section id="distributions" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Distributions</h1>
 <p>What is distribution? We use this word all the time.</p>
 <p>When speaking about distributions, we mean <strong>the law of distribution of a random variable</strong> – the correspondence between the possible values ​​of this variable from the range of its admissible values ​​and: the probabilities of these values ​​– for a discrete variable, or the probability density – for a continuous variable.</p>
-<section id="types-of-distributions" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="types-of-distributions"><span class="header-section-number">4.1</span> 5.1 Types of distributions</h2>
+<section id="types-of-distributions" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="types-of-distributions"><span class="header-section-number">3.1</span> 5.1 Types of distributions</h2>
 <p>The laws of probability distributions can not be derived for all quantities! But it so happened that we can describe some patterns, probability distributions, with formulas, as in physics: the force of gravity (the force with which the Earth attracts all bodies) is directly proportional to the mass of the object, taken with the coefficient of acceleration of free fall <span class="math inline">\(F = m*g\)</span>.. We noticed this in relation to the surrounding world and derived a law (not we personally, but representatives of the planet Earth in general). The same is with distributions: we noticed that the probabilities of the distribution of some random variables obey certain laws, and wrote them down. For example, it has been proven that continuous random variables, which are affected by many random factors (for example, height, weight, etc.), are distributed in accordance with <strong>the Gaussian distribution</strong> , also known as <strong>the normal distribution</strong> . Its formula is:</p>
 <p><span class="math inline">\(P(x) = \frac{e^{-(x - \mu)^{2}/(2\sigma^{2}) }} {\sigma\sqrt{2\pi}}\)</span></p>
 <div class="cell">
@@ -5047,8 +5048,8 @@ window.Quarto = {
 <p>You can look and be horrified here <a href="http://www.math.wm.edu/~leemis/chart/UDR/UDR.html" class="uri">http://www.math.wm.edu/~leemis/chart/UDR/UDR.html</a> . Fortunately, we won’t need any of this.</p>
 <p>Less scary version <a href="https://www.johndcook.com/blog/distribution_chart/#normal" class="uri">https://www.johndcook.com/blog/distribution_chart/#normal</a></p>
 </section>
-<section id="distribution-functions" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="distribution-functions"><span class="header-section-number">4.2</span> 5.2 Distribution functions</h2>
+<section id="distribution-functions" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="distribution-functions"><span class="header-section-number">3.2</span> 5.2 Distribution functions</h2>
 <p>Above we got acquainted with probability density, let’s record all the functions applicable to probability that are useful:</p>
 <ul>
 <li><p><strong>probability density function</strong> for continuous variables (e.g.&nbsp;height, weight) and <strong>probability mass function</strong> for discrete variables (e.g.&nbsp;number of cases) – the simplest basic function, often denoted by the letter<code>d*</code></p></li>
@@ -5082,7 +5083,6 @@ window.Quarto = {
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
