@@ -1,9 +1,3 @@
----
-title: "scales"
-format: html
-editor: visual
----
-
 # Data and types of scales
 
 ## Measurement and variable
@@ -35,20 +29,6 @@ burnout <- tibble(teacher_number, age, exp_years, exp_scaled, burnout_MBI, unive
 kable(burnout[1:10,])
 ```
 
-
-| **teacher_number** | **age** | **exp_years** | **exp_scaled** | **burnout_MBI** | **univer** |
-|-----------:|-----------:|-----------:|:-----------|-----------:|:-----------|
-| 1 | 51 | 5 | from 3 to 5 | 26 | MSU |
-| 2 | 54 | 3 | from 3 to 5 | 65 | HSE |
-| 3 | 56 | 3 | from 3 to 5 | 63 | MSU |
-| 4 | 30 | 6 | more than 5 | 33 | RANEPA |
-| 5 | 58 | 3 | from 3 to 5 | 42 | HSE |
-| 6 | 50 | 2 | from 1 to 2 | 50 | RANEPA |
-| 7 | 49 | 1 | from 1 to 2 | 60 | MSU |
-| 8 | 50 | 5 | from 3 to 5 | 44 | HSE |
-| 9 | 56 | 3 | from 3 to 5 | 42 | MSU |
-| 10 | 22 | 6 | more than 5 | 27 | RANEPA |
-
 *What will be the variables here?*
 
 In the definition of measurement, in addition to the feature, there is a second important concept - the scale.
@@ -77,10 +57,10 @@ There are 4 scales in total, if you arrange them from bottom to top according to
 
 | **Scale** | **Description** | **Possible operations** | **Examples** |
 |------------------|------------------|------------------|------------------|
-| **Relationships (absolute)** | Quantitative, there is absolute zero, you can calculate *how much* more or less, and *how many times* | =, ≠≠, \>, \<, +, -, ×, ÷ | Height, weight, number of cases |
-| **Interval (difference)** | Quantitative, but there is no absolute zero, you can calculate *how much* more or less, but you can't calculate *how many times* | =,≠≠, \>, \<, +, - | Temperature in degrees Celsius, timekeeping according to different calendars |
-| **Ordinal (rank, ordinal)** | Categorical (qualitative), you can set “more” or “less”, but you can’t calculate quantitatively how much more or less | =, ≠≠, \>, \< | Education level, neuroticism level, sports rating |
-| **Names (nominal)** | Categorical (qualitative), cannot be set to “more” or “less” | =,≠≠ | Gender, color, place of residence, name of university |
+| **Ration** | Quantitative, there is absolute zero, you can calculate *how much* more or less, and *how many times* | =, ≠≠, \>, \<, +, -, ×, ÷ | Height, weight, number of cases |
+| **Interval** | Quantitative, but there is no absolute zero, you can calculate *how much* more or less, but you can't calculate *how many times* | =,≠≠, \>, \<, +, - | Temperature in degrees Celsius, timekeeping according to different calendars |
+| **Ordinal (rank)** | Categorical (qualitative), you can set “more” or “less”, but you can’t calculate quantitatively how much more or less | =, ≠≠, \>, \< | Education level, neuroticism level, sports rating |
+|  **Nominal** | Categorical (qualitative), cannot be set to “more” or “less” | =,≠≠ | Gender, color, place of residence, name of university |
 
 ## 3.4 Continuous and discrete data
 

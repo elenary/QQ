@@ -1,0 +1,37 @@
+project:
+  type: book
+  output-dir: book
+
+book:
+  title: "Qualitative and Quantitative Research Methods in Psychology"
+  reader-mode: true
+
+  # page-footer:
+  #   left: |
+  #     R for Data Science (2e) was written by Hadley Wickham, Mine
+  #     Çetinkaya-Rundel, and Garrett Grolemund.
+  #   right: |
+  #     This book was built with <a href="https://quarto.org/">Quarto</a>.
+  # cover-image: cover.jpg
+  # favicon: cover.jpg
+  # site-url: https://r4ds.hadley.nz/
+  # repo-url: https://github.com/hadley/r4ds/
+  # repo-branch: main
+  # repo-actions: [edit, issue]
+  chapters:
+    - index.qmd
+    - scales.qmd
+
+
+format:
+  html:
+    theme:
+      - cosmo
+    # code-link: true
+    # 
+    # author-meta: "Hadley Wickham, Mine Çetinkaya-Rundel, and Garrett Grolemund"
+    # include-in-header: "plausible.html"
+    # callout-appearance: simple
+
+# editor: visual
+

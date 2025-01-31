@@ -1,0 +1,42 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Qualitative and Quantitative Research Methods in Psychology",
+    "section": "",
+    "text": "1 Sample\nWe looked at two examples - about the effect of caffeine on attention and the effect of a communication work tool on productivity. In these examples, we assumed that we conducted a study - that is, we recruited a certain number of people and drew a conclusion about how it works in general, not only for these people, but for people in general. Why does this happen? Why can we extend these conclusions to all people who can theoretically drink coffee and use this communication tool? And why do we need this at all?\nImage https://towardsdatascience.com/",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Sample</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#sample-estimates",
+    "href": "index.html#sample-estimates",
+    "title": "Qualitative and Quantitative Research Methods in Psychology",
+    "section": "1.1 Sample estimates",
+    "text": "1.1 Sample estimates\nHow can we make a generalization about all people? What do we do if we want to know the average height of people on the entire planet? Do we measure every person out of the nearly 8 billion on the planet and take the arithmetic mean?\n\n\n\n\n\n\n\n\n\n\nhttps://ourworldindata.org/human-height\n\nThe general population is the set (or totality) of all objects under study within the framework of a specific research question.\nA sample or sample population is a portion of a general population selected to study a specific research question.\nWhen we talk about a general population, we talk about its parameters , for example, the average height of people, we denote it by X. We cannot calculate it directly, so we have to resort to sample estimates , which are often denoted by the same letter as the parameter of the general population, only “with a cap” or “with a line” X̅ is the sample mean, the average height of people in a specific sample.\nSo, when we want to make a conclusion about all people from the general population, we conduct a study on a small sample (depending on the research method, the required sample size can be from 10 to 1000 people) and estimate the studied parameter of the general population based on sample estimates.\nTo avoid confusion about what we are talking about, key population and sample estimates are referred to differently:\n\n\n\n\n\n\n\n\n\nGeneral population\nSample\n\n\n\n\nMean (mathematical expectation)\n\\(\\mu\\)\nM, \\(\\overline X\\)\n\n\nStandard deviation\n\\(\\sigma\\)\ns, sd",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Sample</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#representativeness-of-the-sample",
+    "href": "index.html#representativeness-of-the-sample",
+    "title": "Qualitative and Quantitative Research Methods in Psychology",
+    "section": "1.2 Representativeness of the sample",
+    "text": "1.2 Representativeness of the sample\nAn important concept is the representativeness of the sample – the ability of the sample to reflect the studied parameter of the general population.\nThe same sample may be representative for one research question and not representative for another!\nRepresentativeness is achieved:\n\nBy random selection of people (we don’t take specific ones that we like more, but randomly)\nSample size (it has been proven that with a large sample size it is sufficiently representative of the general population to provide an answer about the parameter being studied)\n\nMethods for forming representative samples\n\nSimple random sample\nSystematic sample\nStratified sample\nCluster sample\n\nA simple random sample is drawn from a large population at random - all elements of the population have an equal chance of being included in the sample.\nSystematic sampling imitates random selection and is commonly used by sociologists in field research when a certain step in selecting people is set: for example, every 5th or 10th person.\nStratified sampling is needed if the feature we are studying can be affected by some parameter that is distributed unevenly in the general population: for example, we are studying the level of life satisfaction, but we know that it is affected by the level of income - and we need to ensure an equivalent distribution of income levels in the sample. Then, from these income strata, subjects are selected randomly.\nCluster sampling includes entire individual clusters, without random selection within them: for example, we are studying schoolchildren, and instead of selecting them randomly, we include several specific schools (clusters) in the sample.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Sample</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#dependent_samples",
+    "href": "index.html#dependent_samples",
+    "title": "Qualitative and Quantitative Research Methods in Psychology",
+    "section": "1.3 Dependent and independent samples",
+    "text": "1.3 Dependent and independent samples\nAnother important concept regarding samples is that they can be dependent or independent.\nIndependent samples are used when we compare groups of observations that belong to different people (schools/institutes/etc.). For example, in our example of the effect of caffeine on attention, we can recruit a group of people who will drink 3 cups of coffee a day, and another group who will drink decaffeinated coffee. These are different people, not related to each other in any way.\nBut if we took the same group of people and measured their attention after 3 cups of coffee in one week, and then tested the effects of a decaffeinated drink on these same people , these would be dependent samples , since these are still the same people.\n\n\n\n\n\n\n\n\n\n\n\nCase\n\n\nResearcher Nikita studied the relationship between age, teaching experience and professional burnout of university teachers. For this, he selected several universities: Moscow State University, the Higher School of Economics and RANEPA. Nikita found 10 teachers from the psychology departments of each university on the VKontakte social network and asked them to fill out the Maslach Burnout Inventory (MBI). Based on the processed data, Nikita made the following conclusions: 1) in Russia, younger teachers burn out more often; 2) teachers with less teaching experience burn out more often; 3) MSU teachers generally burn out less than HSE teachers. What sampling methods did Nikita use? Are the conclusions correct?",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Sample</span>"
+    ]
+  }
+]
