@@ -1,3 +1,10 @@
+---
+format:
+  html:
+    theme: cosmo
+    self-contained: true
+---
+
 # Data and types of scales
 
 ## Measurement and variable
