@@ -23,6 +23,7 @@ book:
     - scales.qmd
     - distributions.qmd
     - descriptives.qmd
+    - r_1.qmd
 
 
 format:
