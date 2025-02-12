@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>5&nbsp; Introduction to Data Analysis in R – Qualitative and Quantitative Research Methods in Psychology</title>
+<title>6&nbsp; Introduction to Data Analysis in R – Qualitative and Quantitative Research Methods in Psychology</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -1702,7 +1702,7 @@ async function fuseSearch(query, fuse, fuseOptions) {
 }
 </script>
 <meta name="quarto:offset" content="./">
-<link href="./descriptives.html" rel="prev">
+<link href="./normdist.html" rel="prev">
 <script>const sectionChanged = new CustomEvent("quarto-sectionChanged", {
   detail: {},
   bubbles: true,
@@ -4755,7 +4755,7 @@ vertical-align: -.125em;
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./r_1.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Introduction to Data Analysis in R</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./r_1.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Introduction to Data Analysis in R</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -4802,19 +4802,25 @@ vertical-align: -.125em;
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./distributions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">distributions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Distributions</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./descriptives.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">descriptive</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Descriptive statistics</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./normdist.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Normal distribution and standardization</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./r_1.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Introduction to Data Analysis in R</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Introduction to Data Analysis in R</span></span></a>
   </div>
 </li>
     </ul>
@@ -4827,15 +4833,15 @@ vertical-align: -.125em;
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#data-and-variables" id="toc-data-and-variables" class="nav-link active" data-scroll-target="#data-and-variables"><span class="header-section-number">5.1</span> 14.1 Data and variables</a>
+  <li><a href="#data-and-variables" id="toc-data-and-variables" class="nav-link active" data-scroll-target="#data-and-variables"><span class="header-section-number">6.1</span> 14.1 Data and variables</a>
   <ul class="collapse">
-  <li><a href="#basic-data-types" id="toc-basic-data-types" class="nav-link" data-scroll-target="#basic-data-types"><span class="header-section-number">5.1.1</span> 14.1.1 Basic data types</a></li>
-  <li><a href="#basic-data-structures" id="toc-basic-data-structures" class="nav-link" data-scroll-target="#basic-data-structures"><span class="header-section-number">5.1.2</span> 14.1.2 Basic data structures</a></li>
+  <li><a href="#basic-data-types" id="toc-basic-data-types" class="nav-link" data-scroll-target="#basic-data-types"><span class="header-section-number">6.1.1</span> 14.1.1 Basic data types</a></li>
+  <li><a href="#basic-data-structures" id="toc-basic-data-structures" class="nav-link" data-scroll-target="#basic-data-structures"><span class="header-section-number">6.1.2</span> 14.1.2 Basic data structures</a></li>
   </ul></li>
-  <li><a href="#operations-with-variables-and-functions" id="toc-operations-with-variables-and-functions" class="nav-link" data-scroll-target="#operations-with-variables-and-functions"><span class="header-section-number">5.2</span> 14.2 Operations with variables and functions</a></li>
-  <li><a href="#getting-started-in-the-environment" id="toc-getting-started-in-the-environment" class="nav-link" data-scroll-target="#getting-started-in-the-environment"><span class="header-section-number">5.3</span> 14.3 Getting Started in the Environment</a></li>
-  <li><a href="#getting-started-with-data" id="toc-getting-started-with-data" class="nav-link" data-scroll-target="#getting-started-with-data"><span class="header-section-number">5.4</span> 14.4 Getting Started with Data</a></li>
-  <li><a href="#tasks-after-seminar" id="toc-tasks-after-seminar" class="nav-link" data-scroll-target="#tasks-after-seminar"><span class="header-section-number">5.5</span> Tasks after seminar</a></li>
+  <li><a href="#operations-with-variables-and-functions" id="toc-operations-with-variables-and-functions" class="nav-link" data-scroll-target="#operations-with-variables-and-functions"><span class="header-section-number">6.2</span> 14.2 Operations with variables and functions</a></li>
+  <li><a href="#getting-started-in-the-environment" id="toc-getting-started-in-the-environment" class="nav-link" data-scroll-target="#getting-started-in-the-environment"><span class="header-section-number">6.3</span> 14.3 Getting Started in the Environment</a></li>
+  <li><a href="#getting-started-with-data" id="toc-getting-started-with-data" class="nav-link" data-scroll-target="#getting-started-with-data"><span class="header-section-number">6.4</span> 14.4 Getting Started with Data</a></li>
+  <li><a href="#tasks-after-seminar" id="toc-tasks-after-seminar" class="nav-link" data-scroll-target="#tasks-after-seminar"><span class="header-section-number">6.5</span> Tasks after seminar</a></li>
   </ul>
 </nav>
     </div>
@@ -4844,7 +4850,7 @@ vertical-align: -.125em;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Introduction to Data Analysis in R</span></h1>
+<h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Introduction to Data Analysis in R</span></h1>
 </div>
 
 
@@ -4863,8 +4869,8 @@ vertical-align: -.125em;
 
 <p>This book is written using the R programming and data processing language and the Bookdown package in the RStudio data science environment.</p>
 <p>To start working in it, you need to download and install the R language itself <a href="https://cran.r-project.org/" class="uri">https://cran.r-project.org/</a> and download and install RStudio, the environment for work <a href="https://posit.co/downloads/" class="uri">https://posit.co/downloads/</a> .</p>
-<section id="data-and-variables" class="level2" data-number="5.1">
-<h2 data-number="5.1" class="anchored" data-anchor-id="data-and-variables"><span class="header-section-number">5.1</span> 14.1 Data and variables</h2>
+<section id="data-and-variables" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="data-and-variables"><span class="header-section-number">6.1</span> 14.1 Data and variables</h2>
 <p><strong>Data</strong> is information presented in a form suitable for storage and processing by humans or information systems (ISO/IEC/IEEE 24765-2010). If data is presented in a form suitable for processing by information systems, it is formalized.</p>
 <p><strong>A variable</strong> is a shell that we define to store data in it and perform operations on it. A variable has <em>a name</em> and the <em>data</em> that it stores.</p>
 <p align="center">
@@ -4878,8 +4884,8 @@ vertical-align: -.125em;
 </div>
 </div>
 <p></p>
-<section id="basic-data-types" class="level3" data-number="5.1.1">
-<h3 data-number="5.1.1" class="anchored" data-anchor-id="basic-data-types"><span class="header-section-number">5.1.1</span> 14.1.1 Basic data types</h3>
+<section id="basic-data-types" class="level3" data-number="6.1.1">
+<h3 data-number="6.1.1" class="anchored" data-anchor-id="basic-data-types"><span class="header-section-number">6.1.1</span> 14.1.1 Basic data types</h3>
 <ul>
 <li><p><strong>Numeric</strong> (whole numbers – <strong>integer</strong> or <strong>numeric</strong> , real numbers – <strong>real</strong> , floating point numbers (fractional) – <strong>float</strong> )</p></li>
 <li><p><strong>Text</strong> ( <strong>character</strong> , if one character, or <strong>string</strong> – many characters)</p></li>
@@ -4888,8 +4894,8 @@ vertical-align: -.125em;
 <li><p><strong>NaN</strong> – not a number, the result of performing an impossible numerical operation (for example, division by 0)</p></li>
 </ul>
 </section>
-<section id="basic-data-structures" class="level3" data-number="5.1.2">
-<h3 data-number="5.1.2" class="anchored" data-anchor-id="basic-data-structures"><span class="header-section-number">5.1.2</span> 14.1.2 Basic data structures</h3>
+<section id="basic-data-structures" class="level3" data-number="6.1.2">
+<h3 data-number="6.1.2" class="anchored" data-anchor-id="basic-data-structures"><span class="header-section-number">6.1.2</span> 14.1.2 Basic data structures</h3>
 <ul>
 <li><p><strong>Vector</strong> – a one-dimensional array of one data type</p></li>
 <li><p><strong>An array</strong> is a multidimensional array of one data type, consisting of vectors of the same length.</p></li>
@@ -4912,8 +4918,8 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 <p><a href="https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/" class="uri">https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/</a></p>
 </section>
 </section>
-<section id="operations-with-variables-and-functions" class="level2" data-number="5.2">
-<h2 data-number="5.2" class="anchored" data-anchor-id="operations-with-variables-and-functions"><span class="header-section-number">5.2</span> 14.2 Operations with variables and functions</h2>
+<section id="operations-with-variables-and-functions" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="operations-with-variables-and-functions"><span class="header-section-number">6.2</span> 14.2 Operations with variables and functions</h2>
 <p>Depending on what type of variables we are working with, we can perform different operations on them.</p>
 <p><strong>An operation</strong> is the execution of some action on data. What performs this action is called <strong>an operator</strong> or <strong>a function</strong> . The difference between them is that an operator performs atomic (single and simple actions), for example, an operator can be a sign of addition, division, greater than or less than, etc. A function does more complex actions: for example, create a vector using the function <code>c()</code>, read data using the function <code>read_csv()</code>, filter data using the function <code>select()</code>. Note that when calling a function, its name is always followed by parentheses.</p>
 <table class="caption-top table">
@@ -4944,7 +4950,7 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 </table>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># vectors  -------------------------------------------------------</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>) <span class="co"># c() -- это  функция, которая создает вектор, вне зависимости от типа данных</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>) <span class="co"># c() -- function for vector creation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1 2 3 4 5</code></pre>
 </div>
@@ -4965,11 +4971,11 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] 10  9  8  7  6  5  4  3  2  1</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>) <span class="co"># функция seq() создает числовой вектор-перечисление значений от 2 до 10 с шагом 2 </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>) <span class="co"># seq(): creates numeric vector from 2 tp 10 and step 2 </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]  2  4  6  8 10</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">2</span>) <span class="co"># функция seq() создает числовой вектор-перечисление значений от 1 до 10 с шагом 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">2</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1 3 5 7 9</code></pre>
 </div>
@@ -4977,7 +4983,7 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>answers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"no"</span>, <span class="st">"yes"</span>, <span class="st">"yes"</span>, <span class="st">"yes"</span>, <span class="st">"no"</span>)</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#пример приведения типов -- TRUE и FALSE превратились в 1 и 0</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Transformation of data types -- TRUE и FALSE became 1 and 0</span></span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1 2 3 4 5 1 0</code></pre>
@@ -4990,8 +4996,7 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>condition <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>) <span class="co">#Logical vector</span></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#примеры приведения типов, когда в векторе встречаются разные типы данных -- R приводит их к одному</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1 2 3 4 1 0</code></pre>
 </div>
@@ -4999,11 +5004,11 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1 2 3 4 5 6</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">3</span>, <span class="sc">-</span><span class="dv">4</span>, <span class="st">"зеленый"</span>, <span class="st">"карий"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">3</span>, <span class="sc">-</span><span class="dv">4</span>, <span class="st">"green"</span>, <span class="st">"brown"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "1"       "10"      "3"       "-4"      "зеленый" "карий"  </code></pre>
+<pre><code>[1] "1"     "10"    "3"     "-4"    "green" "brown"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Logical expressii=ons ------------------------------------------------------</span></span>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Logical expressions ------------------------------------------------------</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">5</span></span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="dv">10</span></span>
@@ -5032,28 +5037,28 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#функция, которая выполняет действия в зависимости от условия ...если ... то:</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ifelse() содержит 3 аргумента: ( условие; что делать, если условие верно;</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co"># что делать, если условие ложно)</span></span>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#function performs if else: </span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ifelse() involves 3 arguments: ( conditioin; what should it does if condition true ;</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co"># what should it does if condition false)</span></span>
 <span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ifelse</span>(a <span class="sc">&lt;</span> b, a<span class="sc">+</span>b, <span class="st">"а не меньше b"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ifelse</span>(a <span class="sc">&lt;</span> b, a<span class="sc">+</span>b, <span class="st">"а more than b"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 15</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># датафрейм ---------------------------------------------------------------</span></span>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># dataframes ---------------------------------------------------------------</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>eye_color <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"green"</span>, <span class="st">"brown"</span>, <span class="st">"grey"</span>, <span class="st">"blue"</span>, <span class="st">"red"</span>)</span>
 <span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(vector1, age, answers, condition, eye_color) <span class="co">#функция data.frame() создает датафрейм (табличку с данными) из существующих векторов</span></span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(data) <span class="co"># функция View() открвает эту табличку в отдельной вкладке (то же, что и по клику иконки в окне Environment)</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(vector1, age, answers, condition, eye_color) <span class="co"># data.frame() creates dataframe from vectors</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(data) <span class="co">#  View() open this dataframe in the next tab</span></span>
 <span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>age <span class="co"># отбираем колонку из датафрейма: название_датафрейма$название_колонки</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>age <span class="co"># select column from dataframe</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 18 22 25 20 21</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># описательные визуализации</span></span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(data<span class="sc">$</span>age, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">18</span>, <span class="dv">22</span>, <span class="dv">27</span>))</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(data<span class="sc">$</span>age)) <span class="co">#добавляет график плотности вероятности на гистограмму</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(data<span class="sc">$</span>age)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -5070,7 +5075,7 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># описательные статистики</span></span>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># descriptive statistics</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(data<span class="sc">$</span>age)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 21.2</code></pre>
@@ -5079,7 +5084,7 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2.588436</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">sd</span>(data<span class="sc">$</span>age),<span class="dv">1</span>) <span class="co">#округляет до 1 цифры после запятой</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">sd</span>(data<span class="sc">$</span>age),<span class="dv">1</span>) <span class="co">#rounds to 1 digit</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2.6</code></pre>
 </div>
@@ -5102,23 +5107,23 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 </div>
 </div>
 </section>
-<section id="getting-started-in-the-environment" class="level2" data-number="5.3">
-<h2 data-number="5.3" class="anchored" data-anchor-id="getting-started-in-the-environment"><span class="header-section-number">5.3</span> 14.3 Getting Started in the Environment</h2>
+<section id="getting-started-in-the-environment" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="getting-started-in-the-environment"><span class="header-section-number">6.3</span> 14.3 Getting Started in the Environment</h2>
 <p>In this tutorial I will provide tasks for training in any data working environment and code for working with data in R.</p>
 <p>For most interesting operations in R, we will need additional packages - a set of functions that someone has already written for us (the same as, for example, <code>import numpy as np</code>in Python). We will mainly need the package <code>tidyverse</code>, literally - “the universe of clean data”. Let me say right away that everything marked with the # symbol is comments, our hints that will not be executed. It is important to leave them for yourself, so as not to forget what is happening here.</p>
 <p>For the package to work, it needs to be 1. installed and 2. connected</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># устанавливаем пакет</span></span>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install package</span></span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"tidyverse"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># подключаем пакет</span></span>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># switch on package</span></span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You only need to install the package once after installing R, <code>library</code>you always need to connect via when you open RStudio. An error like “could not find function” in 99% of cases indicates that the package from which it is used is not connected.</p>
 </section>
-<section id="getting-started-with-data" class="level2" data-number="5.4">
-<h2 data-number="5.4" class="anchored" data-anchor-id="getting-started-with-data"><span class="header-section-number">5.4</span> 14.4 Getting Started with Data</h2>
+<section id="getting-started-with-data" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="getting-started-with-data"><span class="header-section-number">6.4</span> 14.4 Getting Started with Data</h2>
 <p>We will work with the World Happiness Report data for 2016 <a href="https://www.kaggle.com/datasets/unsdsn/world-happiness" class="uri">https://www.kaggle.com/datasets/unsdsn/world-happiness</a> . This is the World Happiness Report <a href="https://en.wikipedia.org/wiki/World_Happiness_Report" class="uri">https://en.wikipedia.org/wiki/World_Happiness_Report</a> , which shows how residents of different countries rate their level of happiness. They can also be downloaded from the link <a href="https://raw.githubusercontent.com/elenary/StatsForDA/main/2016.csv" class="uri">https://raw.githubusercontent.com/elenary/StatsForDA/main/2016.csv</a> (right-click in the opened file - Save as). The 2016 data we will work with includes 157 countries. <em>By the way, can you download data for different years and see how the number of participating countries changed? A little later we will learn how to do this using code</em> . There are the following variables here:</p>
 <ul>
 <li><p>Happiness Rank - position in the ranking</p></li>
@@ -5135,14 +5140,14 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 <p>Economy, Family, Health, Freedom, Trust, Generosity – 6 indicators by which the level of happiness is calculated.</p>
 <p>To perform operations with data, they first need to <em>be read</em> , loaded into the data working environment. In modern traditions of R, this is easiest to do using a function <code>read_csv()</code>from the package <code>tidyverse</code>. Do not forget that any function call is accompanied by parentheses, into which arguments are passed. In the function <code>read_csv()</code>in parentheses, you need to pass the path to the file that we want to read. It can be copied through the file properties. But in order not to bother with the path, the easiest way is to put the data file in the same folder where our file with the code itself is located (for this, you need to save it). And the most elegant and commonly used solution is to create a project File - New Project, and store all files in the project folder, this saves from a large number of errors. Importing files is described in great detail by Ivan Pozdnyakov <a href="https://pozdniakov.github.io/tidy_stats/030-import_data.html" class="uri">https://pozdniakov.github.io/tidy_stats/030-import_data.html</a></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>whr <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"2016.csv"</span>) <span class="co"># читаем данные </span></span>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>whr <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"2016.csv"</span>) <span class="co"># read data sheet </span></span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(whr) <span class="co"># просматриваем, что получилось передать в объект с названием whr </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(whr) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now I want to explore this data. Remember how we start exploring data? With <a href="https://elenary.github.io/StatsForDA/descriptives">descriptive statistics</a></p>
 <p>I can select all the variables one by one and calculate the mean and standard deviation for them – this is what is in the Descriptives tab in Jamovi. Since the column does not exist in a vacuum, but inside a dataset, we need to somehow indicate that we are interested in a specific column inside a specific dataset. For now, the easiest way to do this is with the icon <code>$</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>whr<span class="sc">$</span>Family <span class="co"># отбираем всю колонку </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>whr<span class="sc">$</span>Family <span class="co"># select column</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  [1] 1.16374 1.14524 1.18326 1.12690 1.13464 1.09610 1.02912 1.17278 1.10476
  [10] 1.08764 0.99537 1.08383 1.04782 1.02152 1.08113 1.09774 1.03938 1.05249
@@ -5166,7 +5171,7 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 </div>
 <p>Or we can remember that a data frame has two dimensions, like <a href="https://elenary.github.io/StatsForDA/data_structures">a two-dimensional array</a> , and we can access it by index (in square brackets): row number (first number) and column number (second number). If we are not interested in a specific row, but all rows, then nothing is put in place of this index, as if we are skipping it.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>whr[,<span class="dv">8</span>] <span class="co"># отбираем всю колонку другим способом</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>whr[,<span class="dv">8</span>] <span class="co"># select column but using other way</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 157 × 1
    Family
@@ -5187,20 +5192,20 @@ https://practicum.yandex.ru/blog/10-osnovnyh-struktur-dannyh/
 <p>Pay attention to the output: what data structures do you think the results of the first and second methods belong to?</p>
 <p>Let’s calculate the mean and standard deviation for this column.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(whr<span class="sc">$</span>Family) <span class="co"># среднее</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(whr<span class="sc">$</span>Family) <span class="co"># mean</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.7936211</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(whr<span class="sc">$</span>Family) <span class="co"># стандартное отклонение</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(whr<span class="sc">$</span>Family) <span class="co"># standart deviation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.2667057</code></pre>
 </div>
 </div>
 </section>
-<section id="tasks-after-seminar" class="level2" data-number="5.5">
-<h2 data-number="5.5" class="anchored" data-anchor-id="tasks-after-seminar"><span class="header-section-number">5.5</span> Tasks after seminar</h2>
+<section id="tasks-after-seminar" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="tasks-after-seminar"><span class="header-section-number">6.5</span> Tasks after seminar</h2>
 <ol type="1">
 <li><p>Read the 2016 WHR data in the environment you are working in (in R, use the function <code>read_csv()</code>from the package <code>tidyverse</code>).</p></li>
 <li><p>Calculate the mean, standard deviation, median, and range (spread from maximum to minimum value) for all 6 indicators that make up the level of happiness (Economy, Family, Health, Freedom, Trust, Generosity). What can you say about them? Where is the largest range? Where are the mean and median close to each other, and where are they not so close? <em>(To calculate the median and range in R, you will need to learn to google a little or use other materials)</em></p></li>
@@ -5630,8 +5635,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./descriptives.html" class="pagination-link" aria-label="descriptive">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">descriptive</span></span>
+      <a href="./normdist.html" class="pagination-link" aria-label="Normal distribution and standardization">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Normal distribution and standardization</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

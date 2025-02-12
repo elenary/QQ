@@ -57,7 +57,7 @@ knitr::include_graphics("images/Standard_deviation_diagram.png")
 The latter property gives us very great opportunities when working with a normal distribution: for example, having a representative sample of height measurements, we can calculate the probability with which, for example, we will meet a woman with a height of 158 cm. Let's recall the visualization from the first seminars <https://ourworldindata.org/human-height>
 
 ```{r fig.align = 'center',echo = FALSE, message = FALSE, out.width="60%"}
-knitr::include_graphics("docs/images/height_distribution.png")
+knitr::include_graphics("images/height_distribution.png")
 ```
 
 To calculate this probability, we essentially need to enter into the normal distribution formulaxxinsertx=158x=158, and asμμAndσσuse sample means and standard deviations.
@@ -79,7 +79,7 @@ What if we need to estimate which probability is higher: to meet a woman who is 
 **The standard normal distribution** is a normal distribution centered at zero ($\mu=0$) and standart distribution equal to 1 ($\sigma=1$).
 
 ```{r fig.align = 'center', echo = FALSE, message = FALSE, out.width="80%"}
-knitr::include_graphics("docs/images/z-dist.png")
+knitr::include_graphics("images/z-dist.png")
 ```
 This distribution is universal and dimensionless: on the scale we no longer haveσσ, and numbers that have no dimension. This scale is called the z-scale, and the distribution itself is also called the z-distribution. Any normal distribution can be brought to the form of a standard normal - this procedure is called the z-transformation
 
