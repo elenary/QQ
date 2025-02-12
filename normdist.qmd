@@ -1,0 +1,129 @@
+---
+format:
+  html:
+    theme: cosmo
+    self-contained: true
+---
+
+# Normal distribution and standardization
+
+```{r, eval=TRUE, echo = FALSE, message = FALSE}
+library(tidyverse)
+library(kableExtra)
+```
+
+## Normal distribution and its properties
+
+We have already discussed the normal distribution when we talked about distributions in general \[# Distributions\]. This is a probability law, where given values of a feature are matched with the probability of encountering a feature with such a value, expressed by the formula
+
+$P(x) = \frac{1}{\sigma\sqrt{2\pi}} * e^{-\frac{(x - \mu)^2}{2(\sigma)^2}}$
+
+If you look closely at the formula for the normal distribution, you will notice that almost everything in it is constant, except for the variablex x and two unknown parameters:$\mu$ и $\sigma$.. These are our already familiar friends: *the mean of the general population (the mathematical expectation* and *standard deviation of the general population* ). Thus, in order to construct a distribution for any feature that is normally distributed in the general population, we **only need to know two parameters of the distribution** :
+
+-   average
+
+-   standard deviation
+
+In addition to the formula itself, you can often see the following notation denoting a normal distribution: $\sim \mathcal{N}(\mu, \, \sigma^2)$
+
+The figure shows that the mean is responsible for the position of the distribution center, and the standard deviation is responsible for its “stretching” along the axis.XX, the width of the bell.
+
+```{r fig.align = 'center', eval=TRUE, echo = FALSE, message = FALSE, out.width="80%"}
+knitr::include_graphics("images/different_norm_vis-1.png")
+```
+
+Image from [Wikipedia](https://ru.wikipedia.org/wiki/%D0%9D%D0%BE%D1%80%D0%BC%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5_%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5)
+
+Why do we pay so much attention to the normal distribution?
+
+-   The normal distribution is interesting to us at least because most of the features we study are random variables that are affected by a large number of random factors - and therefore, according to [the central limit theorem](https://ru.wikipedia.org/wiki/%D0%A6%D0%B5%D0%BD%D1%82%D1%80%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F_%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F_%D1%82%D0%B5%D0%BE%D1%80%D0%B5%D0%BC%D0%B0) , are distributed normally. As a consequence, physical, biological and psychological features (height, weight, expression of personality traits) are usually distributed normally: average features are found in nature more often than more radical ones.
+
+-   The normal distribution is symmetrical and unimodal, and is easier to work with in some operations.
+
+-   In order to estimate the probability of meeting a person of a certain height, we only need to know (or estimate) the mean and standard deviation of the general population - and then we calculate this probability using the normal distribution formula.
+
+**The normal distribution has a number of properties** :
+
+-   symmetrically
+
+-   unimodal (only one mode)
+
+-   deviations from the mean obey the law of probability: we know what percentage of the data is contained in how many standard deviations from the mean
+
+```{r fig.align = 'center',echo = FALSE, message = FALSE, out.width="80%"}
+knitr::include_graphics("images/Standard_deviation_diagram.png")
+```
+
+The latter property gives us very great opportunities when working with a normal distribution: for example, having a representative sample of height measurements, we can calculate the probability with which, for example, we will meet a woman with a height of 158 cm. Let's recall the visualization from the first seminars <https://ourworldindata.org/human-height>
+
+```{r fig.align = 'center',echo = FALSE, message = FALSE, out.width="60%"}
+knitr::include_graphics("docs/images/height_distribution.png")
+```
+
+To calculate this probability, we essentially need to enter into the normal distribution formulaxxinsertx=158x=158, and asμμAndσσuse sample means and standard deviations.
+
+Some percentage values ​​from this distribution are worth remembering because they will appear frequently - these are the values ​​for the amount of data that lies within one or more standard deviations of the mean.
+
+**“Three Sigma Rule”** :
+
+-   within one standard deviation of the mean ($\bar x ± \sigma$) 68% of the values ​​are very frequent values;
+
+-   within two standard deviations from the mean ($\bar x ± 2\sigma$) contains 95% of the values ​​- the majority of the sample;
+
+-   within three standard deviations from the mean ($\bar x ± 3\sigma$) is almost 100% of the sample - that is, the entire sample.
+
+## Standard Normal Distribution (z-Distribution)
+
+What if we need to estimate which probability is higher: to meet a woman who is 158 cm tall or a man who is 174 cm tall? As we can see from the vuzilization above, these distributions are slightly different, and we cannot place these values ​​on one. Here, **the standard normal distribution** or **z-distribution comes to our aid.**
+
+**The standard normal distribution** is a normal distribution centered at zero ($\mu=0$) and standart distribution equal to 1 ($\sigma=1$).
+
+```{r fig.align = 'center', echo = FALSE, message = FALSE, out.width="80%"}
+knitr::include_graphics("docs/images/z-dist.png")
+```
+This distribution is universal and dimensionless: on the scale we no longer haveσσ, and numbers that have no dimension. This scale is called the z-scale, and the distribution itself is also called the z-distribution. Any normal distribution can be brought to the form of a standard normal - this procedure is called the z-transformation
+
+## Z-transformation and standardization
+
+Standardization is the process of transforming a normal distribution to a standard dimensionless Z-score with a mean of 0 and a standard deviation of 1.
+
+To achieve standardization, two things need to be done:
+
+-   center the distribution - if it has been shifted away from zero (e.g. $\mu=15$), then we need to return it to the center $\mu=0$
+
+-   normalize a distribution - get rid of the difference in deviations $\sigma$, bring our distribution to the distribution with $\sigma=1$
+
+Given these two operations, the z-transform formula is as follows:
+
+$Z_x = \frac{x - \mu}{\sigma}$ 
+
+The Z-score can be placed on the Z-distribution and see what percentage of the data lies *to the left of* the Z-score, i.e. *is less likely* . This percentage can be calculated using the normal distribution formula by substituting $\mu=0$ и $\sigma=1$, but it is easier to use Z-score tables (they are easy to google), for example <https://www.z-table.com/>
+
+Standardization does not change the nature of the distribution, it only changes the position of its center and the “flattening” along the h-axis – that is, literally what we know from the properties of the mean and variance
+
+```{r fig.align = 'center', echo = FALSE, message = FALSE, out.width="100%"}
+knitr::include_graphics("images/centring_norming-1.png")
+```
+
+The Z-scale can be interpreted as a scale of typicality or frequency of occurrence of values: everything that lies in +- 1 is very common, and the further from the center, the rarer the values ​​we encounter.
+
+Thus, the Z-transform is used to:
+
+-   Find out how typical (frequent) the value we encounter is
+
+-   Compare the probabilities of finding values ​​from two different samples (normally distributed)
+
+For example, we (somehow) know that the average height of women is 165 cm with a standard deviation of 7, and the average height of men is 178 and a standard deviation of 8.
+
+Returning to our question:
+
+$W_{158}$: $Z_{158} = \frac{x - \mu_w}{\sigma_w} = \frac{158 - 165}{7} = -1$ 
+
+$M_{174}$: $Z_{174} = \frac{x - \mu_m}{\sigma_m} = \frac{174- 178}{8} = -0.5$ 
+
+We have converted the height of men and women into Z-scores and can now place them on the Z-distribution. It is already clear that the number -1 is located to the left of the number -0.5, which means that the probability of meeting a woman with a height of 158 cm is less than a man with a height of 174 cm. To estimate this probability accurately, we will have to use the Z-score tables <https://www.z-table.com/>
+
+$Z_{w_158} = -1$, which corresponds to approximately 16% probability
+$Z_{m_174} = -0.5$, which corresponds to approximately 30% probability
+
+Thus, the probability of meeting a woman with a height of 158 cm is 16%, and this is 14% less than the probability of meeting a man with a height of 174 cm.
