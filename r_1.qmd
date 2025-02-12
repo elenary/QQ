@@ -68,7 +68,7 @@ Depending on what type of variables we are working with, we can perform differen
 
 ```{r eval=TRUE, echo = TRUE, message = FALSE}
 # vectors  -------------------------------------------------------
-c(1, 2, 3, 4, 5) # c() -- это  функция, которая создает вектор, вне зависимости от типа данных
+c(1, 2, 3, 4, 5) # c() -- function for vector creation
 
 # numeric vectors  -------------------------------------------------------
 c(1, 2, 3, 4, 5, 7, 21, 143)
@@ -80,14 +80,14 @@ age <- c(18, 22, 25, 20, 21)
 1:10 # function : creates vector from 1 to 10 with step 1
 10:1
 
-seq(2, 10, 2) # функция seq() создает числовой вектор-перечисление значений от 2 до 10 с шагом 2 
-seq(1, 10, 2) # функция seq() создает числовой вектор-перечисление значений от 1 до 10 с шагом 2
+seq(2, 10, 2) # seq(): creates numeric vector from 2 tp 10 and step 2 
+seq(1, 10, 2) 
 
 # Character vector -------------------------------------------------------
 
 answers <- c("no", "yes", "yes", "yes", "no")
 
-#пример приведения типов -- TRUE и FALSE превратились в 1 и 0
+#Transformation of data types -- TRUE и FALSE became 1 and 0
 c(1, 2, 3, 4, 5, TRUE, FALSE)
 c(1, 2, 3, 4, 5, "1", "0")
 
@@ -95,12 +95,11 @@ c(1, 2, 3, 4, 5, "1", "0")
 
 condition <- c(TRUE, FALSE, TRUE, TRUE, FALSE) #Logical vector
 
-#примеры приведения типов, когда в векторе встречаются разные типы данных -- R приводит их к одному
 c(1, 2, 3, 4, TRUE, FALSE)
 c(1, 2, 3, 4, 5, 6)
-c(1, 10, 3, -4, "зеленый", "карий")
+c(1, 10, 3, -4, "green", "brown")
 
-# Logical expressii=ons ------------------------------------------------------
+# Logical expressions ------------------------------------------------------
 
 a <- 5
 b <- 10
@@ -112,33 +111,33 @@ a != b
 a <= b
 a < b
 
-#функция, которая выполняет действия в зависимости от условия ...если ... то:
-# ifelse() содержит 3 аргумента: ( условие; что делать, если условие верно;
-# что делать, если условие ложно)
+#function performs if else: 
+# ifelse() involves 3 arguments: ( conditioin; what should it does if condition true ;
+# what should it does if condition false)
 
-ifelse(a < b, a+b, "а не меньше b")
+ifelse(a < b, a+b, "а more than b")
 
 
-# датафрейм ---------------------------------------------------------------
+# dataframes ---------------------------------------------------------------
 
 eye_color <- c("green", "brown", "grey", "blue", "red")
   
-data <- data.frame(vector1, age, answers, condition, eye_color) #функция data.frame() создает датафрейм (табличку с данными) из существующих векторов
-View(data) # функция View() открвает эту табличку в отдельной вкладке (то же, что и по клику иконки в окне Environment)
+data <- data.frame(vector1, age, answers, condition, eye_color) # data.frame() creates dataframe from vectors
+View(data) #  View() open this dataframe in the next tab
 
-data$age # отбираем колонку из датафрейма: название_датафрейма$название_колонки
+data$age # select column from dataframe
 
 # описательные визуализации
 hist(data$age, breaks = c(18, 22, 27))
-lines(density(data$age)) #добавляет график плотности вероятности на гистограмму
+lines(density(data$age)) 
 
 ?hist
 plot(density(data$age))
 
-# описательные статистики
+# descriptive statistics
 mean(data$age)
 sd(data$age)
-round(sd(data$age),1) #округляет до 1 цифры после запятой
+round(sd(data$age),1) #rounds to 1 digit
 
 min(data$age)
 max(data$age)
@@ -155,12 +154,12 @@ For most interesting operations in R, we will need additional packages - a set o
 For the package to work, it needs to be 1. installed and 2. connected
 
 ```{r eval=FALSE, echo = TRUE, message = FALSE}
-# устанавливаем пакет
+# install package
 install.packages("tidyverse")
 ```
 
 ```{r eval=TRUE, echo = TRUE, message = FALSE}
-# подключаем пакет
+# switch on package
 library(tidyverse)
 ```
 
@@ -196,9 +195,9 @@ To perform operations with data, they first need to *be read* , loaded into the 
 
 ```{r eval=TRUE, echo = TRUE, message = FALSE}
 
-whr <- read_csv("2016.csv") # читаем данные 
+whr <- read_csv("2016.csv") # read data sheet 
 
-View(whr) # просматриваем, что получилось передать в объект с названием whr 
+View(whr) 
 ```
 
 Now I want to explore this data. Remember how we start exploring data? With [descriptive statistics](https://elenary.github.io/StatsForDA/descriptives)
@@ -206,13 +205,13 @@ Now I want to explore this data. Remember how we start exploring data? With [des
 I can select all the variables one by one and calculate the mean and standard deviation for them – this is what is in the Descriptives tab in Jamovi. Since the column does not exist in a vacuum, but inside a dataset, we need to somehow indicate that we are interested in a specific column inside a specific dataset. For now, the easiest way to do this is with the icon `$`:
 
 ```{r eval=TRUE, echo = TRUE, message = FALSE}       
-whr$Family # отбираем всю колонку 
+whr$Family # select column
 ```
 
 Or we can remember that a data frame has two dimensions, like [a two-dimensional array](https://elenary.github.io/StatsForDA/data_structures) , and we can access it by index (in square brackets): row number (first number) and column number (second number). If we are not interested in a specific row, but all rows, then nothing is put in place of this index, as if we are skipping it.
 
 ```{r eval=TRUE, echo = TRUE, message = FALSE}
-whr[,8] # отбираем всю колонку другим способом
+whr[,8] # select column but using other way
 ```
 
 Pay attention to the output: what data structures do you think the results of the first and second methods belong to?
@@ -220,11 +219,11 @@ Pay attention to the output: what data structures do you think the results of th
 Let's calculate the mean and standard deviation for this column.
 
 ```{r eval=TRUE, echo = TRUE, message = FALSE}  
-mean(whr$Family) # среднее
+mean(whr$Family) # mean
 ```
 
 ```{r eval=TRUE, echo = TRUE, message = FALSE}      
-sd(whr$Family) # стандартное отклонение
+sd(whr$Family) # standart deviation
 ```
 
 ## Tasks after seminar
