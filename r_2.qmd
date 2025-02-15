@@ -1,0 +1,394 @@
+---
+format:
+  html:
+    theme: cosmo
+    self-contained: true
+---
+
+## Data preprocessing
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+library(tidyverse)
+library(kableExtra)
+whr <- read_csv("2016.csv") # read data sheet 
+```
+
+After we have read the data into a variable (we used a function for this), we often need to **preprocess**`read_csv()` the data first . First, the data itself may not be of very good quality, and it needs to be cleaned. Second, we never work with the entire table at once - we select data, for example, a certain column, and often we do not need all the data, but only those that meet certain conditions (for example, we need to select reaction times in a group where subjects consumed caffeine, not a placebo).
+
+Data preprocessing most often includes:
+
+-   Selecting specific columns
+
+-   Filtering - selecting specific rows that meet certain conditions
+
+-   Create new columns and fill them according to certain conditions
+
+-   Working with missing values ​​- removing or replacing with some (for example, average) value
+
+Let's go in order.
+
+### Column selection
+
+Almost anything can be done in different ways. Most often, there is no right way; if it works, it is right. But some solutions are more optimal in different contexts. Let's look at different ways of selecting columns. Notice how they differ?
+
+*A comment right away - when we do the assignment operation \<-, nothing is output to the console. To see what we assigned to the variable, you can output it by name or, if we are talking about data, look using the View() function. If you are just trying to write an operation - do not rush to assign it to a variable! This way we will immediately see the result in the console, and if it is wrong, it will be clear.*
+
+**Selection in basic R by column name**
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+var1 <- whr$`Happiness Score`
+var1
+str(var1)
+```
+
+**Selection in base R by index**
+
+An index is a number of an element in a data structure. We talked about them when we discussed multidimensional arrays: in a one-dimensional structure, for example, a vector, the index will consist of one number, in a two-dimensional structure (for example, a matrix or a data frame) the index consists of two numbers separated by a comma, in a three-dimensional structure it consists of three numbers, and so on. An index in R is always written in square brackets, for example, to find out what is in the second row of the third column, the index of the element will be `[2,3]`. **First comes the row number, then the column number.** If we want to output all the rows or all the columns, nothing is put in place of this index. For example, if I want to output all the rows from the third column, I will write`[,3]`
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+var2 <- whr[,4]
+var2
+str(var2)
+```
+
+**Filtering by name using the tidyverse package**
+
+First, a couple of important points about working with the package and the code writing culture `tidyverse`. The sequence of operations within one task is written line by line with a transfer to the next line in the form of [a pipe](https://magrittr.tidyverse.org/reference/pipe.html) `%>%` - a symbol that allows you to use as an argument to the function of the next line what was obtained as a result of executing the previous one. On the first line, the data itself is transferred to the pipe, that is, the name of the variable to which we wrote them. Then, on each subsequent line, the result of executing the previous one will be used as the first argument of the function in brackets. More details about tidyverse <https://pozdniakov.github.io/tidy_stats/110-tidyverse_basic.html> and about pipes <https://pozdniakov.github.io/tidy_stats/110-tidyverse_basic.html>
+
+Internally, `tidyverse`a data structure such as `tibble`( <https://tibble.tidyverse.org/> ) is used. Tibble is a modified dataframe, as we already discussed when discussing [data structures.](https://elenary.github.io/StatsForDA/R_analysis.html#data_structures)
+
+Output to dataframe (tibble):
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+var3 <- whr %>%
+  select(`Happiness Score`)
+var3
+
+#смотрим структуру данных
+str(var3)
+```
+
+Using this function, `select()`we can extract not just one column, but several:
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>%
+  select(Country,`Happiness Score`)
+```
+
+**Filtering by name using the tidyverse package**
+
+Note that the previous output is also a tibble, not a vector. To output to a vector, you need to perform one more step using the function `pull()`, which sort of “pulls” the values ​​out of the tibble:
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+var4 <- whr %>%
+  select(`Happiness Score`) %>%
+  pull() #вытягивает числовые значения и превращает в числовой вектор
+var4
+
+#смотрим структуру данных
+str(var4)
+```
+
+In this case, we can even calculate the median or average in the same pipe:
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>%
+  select(`Happiness Score`) %>% #результат -- тиббл
+  pull() %>% #результат -- вектор
+  median()
+```
+
+Otherwise there will be a mistake
+
+```{r eval=FALSE, echo = TRUE, message = FALSE}
+whr %>%
+  select(`Happiness Score`) %>% #результат -- тиббл
+  median()
+```
+
+### Filtering (row selection)
+
+Very often the task of filtering lines arises: when not all data is needed, but only those that satisfy a certain condition
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr[1:10,]
+```
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>% 
+  slice(1:10)
+```
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>%
+  filter(Region == "Central and Eastern Europe") 
+```
+
+Now let's filter these values ​​and take only those values `Happiness Score`​​that correspond to Central and Eastern Europe.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>%
+  filter(Region == "Central and Eastern Europe")  %>%
+  select(`Happiness Score`) 
+```
+
+.. and we will “pull” these values ​​into a numerical vector, so that it will be easier to work with them
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>%
+  filter(Region == "Central and Eastern Europe") %>%
+  select(`Happiness Score`) %>%
+  pull() 
+```
+
+And we will calculate the average
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>%
+  filter(Region == "Central and Eastern Europe") %>%
+  select(`Happiness Score`) %>%
+  pull() %>% 
+  mean()
+```
+
+Now we can compare the average `Happiness Score`for all countries (we calculated it earlier) and only for Central and Eastern Europe. What can we say about them?
+
+Or let's see which countries are in the top 10`Happiness Rank`
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>%
+  filter(`Happiness Rank` <= 10) 
+```
+
+If we need to fulfill several conditions at the same time (for example, countries with `Happiness Score`at least 10 but more than 7), then we can use the logical “and” and logical “or” (the difference between them is that “and” selects only those rows that satisfy AND the first AND the second condition, and “or” selects rows that satisfy any of the conditions, OR the first OR the second)
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>% 
+  filter(`Happiness Rank` <= 10 | `Happiness Score` >=7) %>% #логическое или
+  View() 
+
+whr %>% 
+  filter(`Happiness Rank` <= 10 & `Happiness Score` >=7) %>% #логическое и
+  View() 
+```
+
+### Creating columns
+
+Often there is a task to recode a variable - for example, to split continuous values ​​into groups to see the differences between them.
+
+For example, continuing the previous example of filtering the top 10 countries in the ranking: to compare the indicators that contribute to the level of happiness, we may be interested in whether the “top” countries are different from all the others. For this, it is easier for us to create a separate column that serves as an indicator of whether a country is “top”. Let's figure out what this means: we need to 1) create a new column and 2) write values ​​​​that satisfy a certain condition into it. (1) is achieved using a function `mutate()`(as if “changing” the data frame, “adopting” the column to it), and (2) is achieved in a way very similar to filtering - using a function `ifelse`
+
+In a pair, top and non-top countries turned into `hehe`and `not hehe`, so let's leave it that way.
+
+```{r eval=FALSE, echo = TRUE, message = FALSE}
+whr_top <- whr %>% 
+  mutate("Rank Category" = ifelse(`Happiness Rank` <=10, "hehe", "not hehe"))
+
+View(whr_top)
+```
+
+If we display the dataframe, we will see that a new column has appeared in the last place `Rank Category`.
+
+New values ​​can also correspond to some mathematical operation, for example, let's create a new column showing how many times the happiness level in a country exceeds the values ​​of a dystopian country:
+
+```{r eval=FALSE, echo = TRUE, message = FALSE}
+whr %>% 
+  mutate("Times" = `Happiness Score` / `Dystopia Residual`) %>% 
+  View()
+```
+
+### Handling Missing Values ​​(NA)
+
+As already mentioned in the section on [data types](https://elenary.github.io/StatsForDA/R_analysis.html#data_types) , there is a separate data type that encodes missing values ​​- NA, Not Available. This is a special type, because due to missing values ​​we cannot evaluate the data as a whole. Such situations are extremely common, so special methods for handling NA have been invented.
+
+To study this section, we will need the data `2016-2`at the link <https://raw.githubusercontent.com/elenary/StatsForDA/main/2016-2.csv> (right mouse button – save as)
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr_new <-read_csv("2016-2.csv")
+# View(whr_new)
+```
+
+The first important function for dealing with NA values ​​is `is.na()`, checking whether each element of a vector or dataframe is NA, and mechanisms for counting the number of such values.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+is.na(whr_new$`Happiness Score`)
+
+#помним, что TRUE -- это 1, а FALSE -- 0. Поэтому можем перевести результаты в числовой вектор
+as.numeric(is.na(whr_new$`Happiness Score`))
+
+#подсчет количества NA
+sum(as.numeric(is.na(whr_new$`Happiness Score`)))
+sum(is.na(whr_new$`Happiness Score`))
+```
+
+One of the big problems with these values ​​is that they make calculations difficult. When part of the data is missing, it is impossible to tell what the sample mean is.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr_new %>% 
+  select(`Happiness Score`) %>% 
+  pull() %>% 
+  mean()
+
+mean(whr_new$`Happiness Score`)
+```
+
+This happens because it is impossible to add, subtract, or even compare to something a value that is not available.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+1 == NA
+"NA" == NA
+NA == NA
+```
+
+To do this, missing values ​​are usually removed from consideration. For example, using the function `na.omit()`in basic R or using `drop_na()`in the notation `tifdyverse`. **Important!** Depending on what we apply this function to, we either remove NA from the selected column, or, if we apply it to the entire dataframe, **all rows** that have NA in at least one of the columns will be removed.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+
+whr_new$`Happiness Score` 
+mean(whr_new$`Happiness Score`) # выдает NA
+mean(na.omit(whr_new$`Happiness Score`)) # выдает среднее
+
+# выдает NA
+whr_new %>% 
+  select(`Happiness Score`) %>% 
+  pull() %>% 
+  mean()
+
+# выдает среднее
+whr_new %>% 
+  select(`Happiness Score`) %>% 
+  drop_na() %>% 
+  pull() %>% 
+  mean()
+
+# обратите внимание -- так тоже работает, но среднее другое! Почему?
+whr_new %>% 
+  drop_na() %>% 
+  select(`Happiness Score`) %>% 
+  pull() %>% 
+  mean()
+```
+
+For working specifically with descriptive statistics and aggregating functions like sum, there is another life hack for working with missing values ​​- the argument `na.rm = TRUE`inside the functions `mean()`, `median()`, `sum()`. `na.rm = TRUE`literally means “na remove = true”
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+#  через базовый R
+mean(whr_new$`Happiness Score`, na.rm = TRUE)
+
+#  или с помощью тайдиверс
+whr_new %>% 
+  select(`Happiness Score`) %>% 
+  pull() %>% 
+  mean(na.rm = TRUE)
+```
+
+### Sorting
+
+Another common task is to sort a dataframe in ascending or descending order of one variable.
+
+When we only have one vector (numeric or text), and not the entire data table, we can do it like this using basic R:
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+sort(whr_new$`Happiness Score`) #сортировка только вектора
+sort(whr_new$`Happiness Score`, decreasing = TRUE)
+```
+
+If we need to sort the entire table by some column, we will have to resort to tiedivers and sort the table using the function `arrange()`, where the name of the column by which we will sort is passed as an argument. And if we need to specify that the sorting should be in descending order, from large to small, we need to insert the argument`desc()`
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr_new %>% 
+  drop_na() %>% 
+  arrange(Freedom) # сорировка  всей таблицы по колонке Freedom
+
+whr_new %>% 
+  drop_na() %>% 
+  arrange(`Trust (Government Corruption)`) # сорировка  всей таблицы по колонке Trust
+
+whr_new %>% 
+  drop_na() %>% 
+  arrange(desc(`Happiness Score`)) # сортировка всей таблицы по колонке Happiness Score по убыванию
+```
+
+We can also select one column and sort it, we already know how to select one column – we first need to apply the function `select()`:
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr_new %>% 
+  drop_na() %>% 
+  select(`Happiness Score`) %>% 
+  arrange(`Happiness Score`) # сортировка одной колонки по возрастанию
+
+whr_new %>% 
+  drop_na() %>% 
+  select(`Happiness Score`) %>% 
+  arrange(desc(`Happiness Score`)) # сортировка одной колонки по колонке по убыванию
+```
+
+## Descriptive Statistics and Aggregation
+
+### Descriptive statistics
+
+We've already calculated some descriptive statistics at the very beginning of working with the data, to make things more fun. Now let's look at them in more detail.
+
+The most common descriptive statistics of the central tendency measures are the mean, median, and mode. We have already constructed the mean and median, but how do we construct the mode?
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+mean(whr_new$`Happiness Score`, na.rm = TRUE)
+median(whr_new$`Happiness Score`, na.rm = TRUE)
+
+summary(whr_new$`Happiness Score`)
+
+# mode(whr_new$`Happiness Score`, na.rm = TRUE) #выдаст ошибку
+# mode(whr_new$`Happiness Score`)
+```
+
+It so happens that R does not have a special function for mode. There is a logical reason for this - the data we mostly work with is quantitative continuous, and we discussed that for this kind of data the concept of mode is a bit artificial. But we still need to calculate the mode sometimes. So you can either write a function to calculate it yourself, or use a ready-made function from the package. I googled what can be done, and I recommend you always do this in such situations - and chose the function `mlv()`(most likely value) from the package`modeest`
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+# install.packages("modeest")
+library(modeest)
+mlv(whr_new$`Happiness Score`, na.rm = TRUE)
+mlv(whr_new$Region, na.rm = TRUE)
+```
+
+Or, you can use a simple function `table()`that counts the number of values ​​of a specified variable.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+table(whr_new$Region)
+```
+
+In addition to measures of central tendency, we can calculate measures of variability – minimum and maximum, range, standard deviation, dispersion, interquartile range.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+min(whr_new$`Happiness Score`, na.rm = TRUE)
+max(whr_new$`Happiness Score`, na.rm = TRUE) 
+range(whr$`Happiness Score`) #размах
+sd(whr_new$`Happiness Score`, na.rm = TRUE) #стандартное отклонение
+var(whr_new$`Happiness Score`, na.rm = TRUE) #дисперсия
+IQR(whr_new$`Happiness Score`, na.rm = TRUE) #межквартильный размах
+```
+
+We also calculated descriptive statistics using the function `summary()`. There are more advanced functions that calculate a large number of descriptive statistics at once. For example, the skim() function from the skimr package is often used - in addition to measures of central tendency and all four quartiles, it calculates the standard deviation and even builds a small histogram. summary(whr_new\$ `Happiness Score`)
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+summary(whr_new$`Happiness Score`)
+# install.packages("skimr")
+library(skimr)
+skim(whr_new$`Happiness Score`)
+```
+
+## Assignments after the seminar 2
+
+1.  Follow all the examples in this section to make sure everything works correctly.
+
+2.  See which countries are in places 1-10 and 147-157 (the output should have two columns: `Region`and `Happiness Rank`)
+
+3.  Compare the average economic performance `Economy (GDP per Capita)`and happiness levels `Happiness Score`in Central and Eastern Europe and Western Europe. What can you say about them? Where is the economic performance higher? Where are people happier?
+
+4.  Compare the average economic performance `Economy (GDP per Capita)`and happiness level `Happiness Score`in Western Europe and Southern Asia. What can you say about them? Where is the economic performance higher? Where are people happier?
+
+5.  *(For those working in R only)* Calculate the average `Happiness Score`for all countries and print the countries that are within ± 1 of the average `Happiness Score`(the output should have two columns: `Region`and `Happiness Score`) *Hint: it might be easier to calculate the average separately and save it in a variable first*
+
+6.  Create a column that will contain information about whether the current country `Happiness Score`is above or below the average (the column can be filled with, for example, upper and lower values ​​or any other designations)
+
+7. Calculate how many NAs are in columns Economy (GDP per Capita), Family, Health (Life Expectancy), Freedom, Trust (Government Corruption), Generosity (the task can be done in different ways, any one that gives the correct answer will do)
+8. Calculate descriptive statistics for the , , columns Economy (GDP per Capita): Familymean Freedom, median, mode, standard deviation, variance, and interquartile range, and (for those working in R only) calculate values ​​for quartiles 1 and 3. Answers should be different from NA (one way to find out values ​​by quartile is, for example, using separate common functions for descriptive statistics) .

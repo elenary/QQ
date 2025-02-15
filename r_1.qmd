@@ -7,6 +7,11 @@ format:
 
 #  Introduction to Data Analysis in R
 
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+# switch on package
+library(tidyverse)
+```
+
 This book is written using the R programming and data processing language and the Bookdown package in the RStudio data science environment.
 
 To start working in it, you need to download and install the R language itself <https://cran.r-project.org/> and download and install RStudio, the environment for work <https://posit.co/downloads/> .
@@ -197,7 +202,7 @@ To perform operations with data, they first need to *be read* , loaded into the 
 
 whr <- read_csv("2016.csv") # read data sheet 
 
-View(whr) 
+# View(whr) 
 ```
 
 Now I want to explore this data. Remember how we start exploring data? With [descriptive statistics](https://elenary.github.io/StatsForDA/descriptives)
