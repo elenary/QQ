@@ -538,5 +538,15 @@
     "crumbs": [
       "<span class='chapter-number'>13</span>  <span class='chapter-title'>Testing hypotheses</span>"
     ]
+  },
+  {
+    "objectID": "r_4.html#tasks_sem3",
+    "href": "r_4.html#tasks_sem3",
+    "title": "13  Testing hypotheses",
+    "section": "13.1 Assignments after the seminar 3",
+    "text": "13.1 Assignments after the seminar 3\n\nOn the WHR dataset, conduct at least one correlation test for the entire NHST algorithm: select suitable variables, formulate a hypothesis, formulate H_0 And H_1, select level α, preprocess the data if necessary, and run a correlation test at the chosen significance level. Interpret the results: was the hypothesis confirmed?\nOn the WHR dataset, conduct at least one t-test or its nonparametric analogue using the entire NHST algorithm: select the appropriate variables, formulate a hypothesis, formulate H_0 And H_1, select level α, determine whether the samples are dependent or independent, preprocess the data if necessary, and perform a mean comparison test at the chosen significance level. Interpret the results: was the hypothesis confirmed?",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Testing hypotheses</span>"
+    ]
   }
 ]

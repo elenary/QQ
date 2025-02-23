@@ -259,7 +259,7 @@ whr_ttest %>%
 ```
 
 
-## Assignments after the seminar 4
+## Assignments after the seminar 3 {#tasks_sem3}
 
 1.  On the WHR dataset, conduct at least one correlation test for the entire NHST algorithm: select suitable variables, formulate a hypothesis, formulate H_0 And H_1, select level α, preprocess the data if necessary, and run a correlation test at the chosen significance level. Interpret the results: was the hypothesis confirmed?
 
