@@ -25,6 +25,7 @@ book:
     - descriptives.qmd
     - normdist.qmd
     - inference.qmd
+    - criteria.qmd
     - r_1.qmd
     - r_2.qmd
 
