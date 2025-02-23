@@ -26,6 +26,7 @@ book:
     - normdist.qmd
     - inference.qmd
     - criteria.qmd
+    - group_comparison.qmd
     - r_1.qmd
     - r_2.qmd
 

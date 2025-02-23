@@ -1,0 +1,356 @@
+---
+format:
+  html:
+    theme: cosmo
+    self-contained: true
+---
+# Comparison of group averages
+
+```{r, eval=TRUE, echo = FALSE, message = FALSE}
+library(tidyverse)
+library(kableExtra)
+library(viridis)
+studens_mat <- read_csv("student-mat.csv") %>% 
+  rename_with(., ~ paste0(., "_mat"), .cols = c(absences, paid, G1, G2, G3)) -> studens_mat 
+studens_por <- read_csv("student-por.csv") %>% 
+  rename_with(., ~ paste0(., "_por"), .cols = c(absences, paid, G1, G2, G3)) -> studens_por
+studens_mat %>% 
+  full_join(studens_por, by = c("school","sex","age","address","famsize","Pstatus","Medu","Fedu",
+                             "Mjob","Fjob","reason", "guardian", "traveltime","studytime", "failures", "schoolsup", "famsup",
+                             "activities", "nursery", "higher", "internet", "romantic", "famrel", "freetime", "goout", 
+                             "Dalc", "Walc", "health")) -> students 
+
+students %>% 
+  mutate("student" = paste0("id", row_number()), .before = "school")  %>% 
+  drop_na() %>% 
+  mutate(G_mat = rowMeans(dplyr::select(., c(G1_mat, G2_mat, G3_mat))),
+         G_por = rowMeans(dplyr::select(., c(G1_por, G2_por, G3_por)))) %>% 
+  mutate(absences_mat_groups = ifelse(absences_mat <=5, "less", ifelse(absences_mat <=15, "middle", "more"))) %>% 
+  mutate(absences_por_groups = ifelse(absences_por <=5, "less", ifelse(absences_por <=15, "middle", "more"))) -> students
+```
+
+## T-test
+
+The first of the statistical tests we will consider is one of the simplest options – the t-test.
+
+This is a statistical test whose distribution belongs to the T-distribution family - very similar to the normal distribution, but with higher tails. It is used to compare the means of two groups measured on a metric (quantitative) scale. For other scales, the t-test is not suitable *(although features measured on a Likert scale, for example, on a scale from 1 to 5, can sometimes be attributed to quantitative measurements, but we will not touch on this in this course)*
+
+Null and alternative hypotheses:
+
+<p align="center">$H_0$: $\mu_1 = \mu_2$ </p>
+<p align="center">$H_1$: $\mu_1 \neq \mu_2$ </p>
+
+Let's return to the data about students and our questions and now consider the following question:
+
+> 3.  Is there a statistically significant difference in the average math score between those who skip class more often or less often?
+
+```{r eval=TRUE, echo = FALSE, message = FALSE}
+kable(students[1:10,]) %>% scroll_box(width = "100%") 
+```
+
+We have already discussed in the previous chapter that DV here is the average grade in mathematics (column `G_mat`), IV is the group by amount of absences ( `absences_mat`). DV is quantitative encoded in the ratio scale, IV we should transform from quantitative to categorical. This means that we can use the branch of statistical tests that is suitable for quantitative DV.
+
+Let's go through the algorithm for choosing a statistical test: <https://miro.com/app/board/uXjVOxmKhr8=/?share_link_id=245423331470>
+
+In addition to the main reflected branches, we see that for each criterion there are a number of assumptions.
+
+**Assumptions** are statements about the nature of our data, without which parametric tests will not work correctly (that's why no one likes them).
+
+### Assumptions for the t-test
+
+1.  The data are normally distributed (or, if the measured variable is a random variable, there are more than 30 observations in groups) – this test was discussed in topic about parametric and non parametric distributiioins.
+
+2.  The variances are homogeneous – this is checked using the Levene's test (Homogeneity of Variance test, also known as Levene's test).
+
+### 1Nonparametric analogues
+
+If the assumptions of normality and homogeneity of variances are violated, we cannot use the t-test.
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="70%"}
+knitr::include_graphics("images/scheme-t-tests.png")
+```
+### Independent and paired tests
+
+Here, too, everything is quite simple:
+
+-   If we have independent samples, then we use the independent t-test or its nonparametric analogue – the Mann-Whitney test.
+
+-   If the samples are dependent, then we use the paired t-test or its nonparametric analogue, the Wilcoxon test.
+
+The abundance of names can be intimidating, but in essence, it is the same test with minor adjustments - it's just that more statisticians are immortalized under different names!
+
+### Computing the t-test and nonparametric analogues
+
+The mean score and standard deviation in the groups of those who skip the least (in class we called them parishioners):
+
+```{r eval=TRUE, echo = FALSE, message = FALSE}
+students %>% 
+  filter(absences_mat_groups == "less") %>% 
+  summarise(mean = mean(G_mat), sd = sd(G_mat), n = length(G_mat))
+```
+
+Average score in truant groups:
+
+```{r, eval=TRUE}
+students %>% 
+  filter(absences_mat_groups != "middle") -> students_2
+
+t.test(students_2$G_mat ~ students_2$absences_mat_groups, paired = FALSE)
+```
+
+```{r eval=TRUE, echo = FALSE, warning=FALSE}
+students_2 %>% 
+  ggplot(aes(x=absences_mat_groups, y = G_mat)) +
+  geom_boxplot(aes(fill = absences_mat_groups)) +
+  # scale_fill_viridis(discrete=TRUE) +
+  theme_minimal()
+```
+
+```{r eval=TRUE, echo = FALSE, warning=FALSE}
+students_2 %>% 
+  ggplot(aes(x=absences_mat_groups, y = G_mat)) +
+  geom_violin(aes(fill = absences_mat_groups)) +
+  geom_boxplot(aes(fill = absences_mat_groups), width=0.2) +
+  stat_summary(fun.y = "mean", colour = "black", size = 2, geom = "point") +
+  theme_minimal()
+```
+
+## ANOVA (analysis of variance)
+
+**ANOVA (ANalysis Of VAriance)** is a statistical criterion whose distribution and key statistics belong to the F-distribution family. This is a slightly skewed distribution to the left, which is already very different from the normal one. On this distribution, we (or rather specially trained programs) will place the F-value, which will be calculated. This criterion is used when the dependent variable (DV) is measured on a metric (quantitative) scale, and the independent variables (IV) are categorical (ordinal or nominative). ANOVA is used when the number of comparisons is greater than two - that is, either it is one IV, which can take three values ​​(levels), or the number of IV is greater than or equal to two.
+
+**ANOVA is used when the number of comparisons we need to make becomes greater than two** . It is possible to make two comparisons with ANOVA, but this would be pointless, since it is essentially a good old t-test.
+
+Null and alternative hypotheses for ANOVA:
+
+<p align="center">$H_0$: $\mu_1 = \mu_2 = ... =\mu_n$ </p>
+<p align="center">$H_1$: There is at least one inequality: $\mu_1 \neq \mu_2 \neq ... \neq \mu_n$ </p>
+
+How is it that we need to make more than two comparisons?
+
+### Factors and Levels
+
+**A factor** or **predictor** in linear models and ANOVA is an independent variable.
+
+Typically, we use ANOVA to compare groups, so the independent variable is categorical, it takes on a finite number of values. The NP values ​​are the groups that we compare with each other, they are called **IV levels or factor levels** .
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="70%"}
+knitr::include_graphics("images/levels.png")
+```
+
+Depending on the number of IVs and IV's levels, the experimental design and the design for ANOVA can be specified:
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="100%"}
+knitr::include_graphics("images/factors_levels.png")
+```
+### Why is it variance?
+
+To proceed directly to the analysis, we need to understand a little about what kind of method this is and why it is called variance, although we make assumptions, as in most statistical criteria, regarding the average values ​​by groups. The fact is that this method really takes into account variance, or more precisely, the difference in variances The mathematics of ANOVA is based on the fact that when combining several samples with approximately the same variance, but different averages, the variance increases proportionally to the average of these values. This is due to the fact that all variance can be divided into between-group and within-group. If it turns out that the variance between groups is greater than within, then we can draw a conclusion in favor of differences between the groups. In order to record differences between groups, the intra-group variance here should be as small as possible: the smaller it is within groups and the larger it is between groups, the more serious the conclusion about the differences in the groups we can make.
+
+The F-value is essentially calculated as the ratio of the variances of the two groups.
+
+As a variance for ANOVA mathematics, usually only its numerator is taken, without dividing by the number of elements in the group (and we calculated the variance itself). The numerator of the variance without the denominator **is the sum of squares (Sum of Squares)**
+
+<p align="center">$D = \frac{\sum_{i=1}^{n} (x_i - \overline{x})^2}{n}$</p>
+
+Let's also remember that the standard deviation is the root of the variance:
+
+<p align="center">$\sigma = \frac{\sum_{i=1}^{n} (x_i - \overline{x})}{\sqrt{n}}$</p>
+
+And the sum of squares is the numerator of the variance, SST (Sum of Squares Total):
+
+<p align="center"> $SST = \sum_{i=1}^{n} (x_i - \overline{x})^2$</p>
+
+The total sum of squares SST consists of **the between-group** sum of squares (SSE, Sum of Squares Explained or SSB, Sum of Squares Between groups) and **the within-group** sum of squares (SSR, Sum of Squares Random or SSW, Sum of Squares Within groups)
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="70%"}
+knitr::include_graphics("images/anova_SS.jpg")
+```
+
+<p align="center">$SST = SSE + SSR$</p>
+
+Suppose we have m groups with n observations in each (for simplicity, let's take equal-sized groups). Then the total sum of squares (variance without denominator) is:
+
+<p align="center">$SST = \sum_{i=1}^{m \times n} (x_i - \bar x)^2$</p>
+
+How to calculate between-group and within-group sum of squares?
+
+<p align="center">$SSE = \sum_{j=1}^m (\bar x_j - \bar x)^2$</p>
+<p align="center">$df_{SSE} = m-1$, m -- количество групп </p>
+
+<p align="center">$SSR = \sum_{j=1}^m\sum_{i=1}^n (x_{ij} - \bar x_j)^2$</p>
+<p align="center">$df_{SSR} = m \times n - m$, n – number of elements in a group, m – number of groups
+
+The desired result here is the lowest SSR (within-group) and the highest SSE (between-group).
+
+From this, one of the important indicators for interpreting ANOVA results logically follows:
+
+$R^2 = \frac{SSE}{SST} = 1 - \frac{SSR}{SST}$– the percentage of variance explained by factors ( **the coefficient of determination** ), that is, how well our factors explain the variability of the data.
+
+And there is one step left to calculate the F-value - calculate the average sums of squares, that is, divide them by the number of degrees of freedom for each sum of squares (just as we divided the variance by the number of observations! Let's return to its meaning)
+
+<p align="center">$MSE = \frac{SSE}{df_{SSE}} = \frac{SSE}{m-1}$</p>
+<p align="center">$MSR = \frac{SSR}{df_{SSR}} = \frac{SSR}{m \times n - m}$</p>
+
+And we can calculate the F-value, which we will place on the F-distribution (let me remind you that specially trained machines usually do this for us)
+
+$F = \frac{MSE}{MSR} = \frac{SSE \times (m \times n - m)}{(m-1) \times SSR}$</p>
+
+### F-distribution (Fisher)
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="70%"}
+knitr::include_graphics("images/F-dist.png")
+```
+
+F-distribution or Fisher distribution is a distribution of a value that is calculated as the ratio of the mean squares of the intra- and inter-group variability (very similar to variance) and includes the calculated number of degrees of freedom for the intra- and inter-group variability. With a very large sample, a large value of degrees of freedom, it will also resemble normal!
+
+With a small number of degrees of freedom (small sample), the F-distribution is visually different from the normal one - but for testing the assumption this does not matter at all, since this is the distribution of the F-statistics, not the dependent variable - the assumption of normality or large sample size still applies to them.
+
+### Assumptions for ANOVA
+
+Let's go through the algorithm for choosing a statistical test: <https://miro.com/app/board/uXjVOxmKhr8=/?share_link_id=245423331470>
+
+In addition to the main reflected branches, there are a number of assumptions for each criterion.
+
+Assumptions are statements about the nature of our data, without which parametric tests will not work correctly (that's why no one likes them).
+
+1.  The data are normally distributed (or, if the measured variable is a random variable, there are more than 30 observations in groups) – this test was discussed
+
+2.  If independent, the variances are homogeneous, checked using Levene's Test of Homogeneity of Variance; if dependent, the groups are spheric, checked using the Sphericity test (Mauchly test).
+
+### Nonparametric analogues
+
+In case the assumptions of normality (remember that this is more about a large number of observations in the sample and a visually significant difference from the Gaussian) and homogeneity of variances are violated, we cannot use ANOVA, and we need to use nonparametric analogs.
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="70%"}
+knitr::include_graphics("images/anova-tests.png")
+```
+
+### Simple ANOVA and Repeated Measures
+
+Here, too, everything is quite simple:
+
+-   If we have independent samples, then we use ANOVA or its nonparametric analogue – the Kruskal-Wallis test.
+
+-   If the samples are dependent, then we use ANOVA with repeated measures or its nonparametric analogue – the Friedman test.
+
+The abundance of names can be intimidating, but in essence, it is the same test with minor adjustments - it's just that more statisticians are immortalized under different names!
+
+### Nonlinear effects
+
+A major advantage of comparing three or more groups is that such comparisons allow one to identify nonlinear effects.
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="80%"}
+knitr::include_graphics("images/nonlinear.png")
+```
+
+### Multivariate ANOVA and Factor Interactions
+
+Multivariate ANOVA is the same as ANOVA, only when we have more than one [independent variable (factor)](https://elenary.github.io/StatsForDA/stats_criteria_ttest_anova.html#levels) . Multivariate ANOVA is usually written something like this:$ANOVA \ 2 \times 3$ – this means that we have two factors, 2 levels in the first factor and 3 levels in the second.
+
+Multifactorial ANOVA is interesting because it allows us to study the interaction of these NPs. The nonlinearity of one factor may overlap with the nonlinearity of another, or the effect of a factor may only manifest itself under certain special conditions - this requires a multifactorial design. For example, we study the same concentration of caffeine on attention, give the subjects 1 or 2 cups of coffee to drink, and also want to study this effect depending on the time of day when the subjects drink coffee. It may turn out that the effect of caffeine on attention increases with increasing coffee concentration, but this only happens in the morning hours - and in the evening no difference in attention is found, 1 and 2 cups of coffee act absolutely the same. This is called an interaction factor and manifests itself when we have 2 or more NPs in the study.
+
+Visually, the interaction manifests itself as follows: if you draw a graph of the dependent variable from one of the factors and place a line on this graph corresponding to another factor, then if the lines are not parallel, then we can talk about the presence of interaction.
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="80%"}
+knitr::include_graphics("images/anova_interaction1.jpg")
+```
+
+In the case of several factors (independent variables), the calculation and logic of using ANOVA is exactly the same, only one more factor is added and the interaction of the first factor with the second:
+
+<p align="center">$SST = SSE_{factor1} + SSE_{factor2} + SSE_{factor1} \times SSE_{factor2} +SSR$</p>
+
+### Post-hocs and multiple comparisons
+
+Let's say we performed ANOVA (any of its types), compared the resulting p-value withαα, and it turned out that the p-value < $\alpha$, and we can reject the null hypothesis $H_0$ in favor of an alternative $H_1$. Does this mean that the means are different in all groups? Or could it be that $\mu_1 = \mu_2$ и $\mu_1 \neq \mu_3$? Maybe.
+
+ANOVA says that in some groups there are significant differences between the means, but it does not say which ones. And to find out in which groups there are significant differences, you need to conduct a series of post hoc, a posteriori tests. These are simply paired t-tests ( [we analyzed them ]) to compare each IV level with each other, but already with **an adjustment for multiple comparisons** .
+
+What are these corrections? We need them to avoid increasing the error of the first kind. It turns out that if we test several hypotheses on the same data, then the probability of accidentally obtaining statistically significant differences will increase proportionally to the number of hypotheses tested, that is, comparisons made! This happens because an important assumption about the independence of our conclusions is violated.
+
+And the probability of making a false positive conclusion will no longer be 0.05, but much higher. To avoid this, corrections are introduced for multiple comparisons, which adjust the level $\alpha$ and underestimate it.
+
+The most popular amendments:
+
+-   Bonferronni
+
+-   Tukey
+
+-   FDR
+
+Pairwise post hoc tests are needed when the ANOVA results are significant – this is the next step to understand which levels of factors or their interactions contributed to the significance. If the ANOVA is not significant, then subsequent pairwise comparisons are not needed – we have nothing significant at all (remember that the null hypothesis for ANOVA is the presence of at least one different mean), so there is nothing to compare.
+
+### Computing ANOVA and Nonparametric Analogues
+
+Let's look at the data again and examine the relationship between the math score (variable `G_mat`) and the mother's work (variable `Mjob`).
+
+```{r eval=TRUE, echo = FALSE, message = FALSE}
+kable(students[1:10,]) %>% scroll_box(width = "100%") 
+```
+
+1.  We formulate an empirical hypothesis. We have already discussed that the CP here is `G_mat`, quantitative continuous. NP is `Mjob`, categorical nominative, includes 5 levels.
+
+<p align="center">`G_mat` ~ `Mjob`</p>
+
+2.  We formulate the null hypothesis:
+
+<p align="center">$H_0$: $\mu_r = \mu_u$ </p>
+<p align="center">$H_1$: $\mu_r \neq \mu_u$ </p>
+
+3.  Let's fix that we will test the hypothesis at the level $\alpha = 0.05$
+
+4.  Let's choose a statistical criterion for testing. Let's test the normality of the PP and compare the variances of the two samples.
+
+```{r, eval=TRUE, , echo=FALSE,  message = FALSE, warning= FALSE, out.width="60%"}
+students %>% 
+  ggplot(aes(x=G_mat, y = ..density..)) +
+  geom_histogram(alpha = 0.5) +
+  geom_density() +
+  theme_minimal()
+```
+
+```{r, eval=TRUE, , echo=FALSE, message = FALSE, warning= FALSE, out.width="60%"}
+students %>% 
+  ggplot(aes(sample=G_mat)) +
+  stat_qq() +
+  stat_qq_line() +
+  theme_minimal()
+```
+
+5.  In our case, the criterion is a one-way ANOVA with independent samples. Let's calculate it
+
+```{r, eval=TRUE, message = FALSE, warning= FALSE}
+library("ez")
+model_abs_mat_ez <-  ezANOVA(data = students, dv = G_mat, wid = student,
+                           between = Mjob)
+model_abs_mat_ez
+```
+
+6.  How to interpret the results? The key statistic for us is the F-value
+
+Another good and more detailed chapter (even two) about ANOVA was written by my friend and colleague Anton Angelgardt, if you are interested in going deeper, you can read his material. <https://angelgardt.github.io/SFDA2022/book/oneway-anova.html>
+
+```{r, eval=TRUE, message = FALSE, warning= FALSE}
+model_abs_mat_ez <-  ezANOVA(data = students, dv = G_mat, wid = student,
+                           between = Mjob)
+model_abs_mat_ez
+summary(model_abs_mat_ez)
+```
+
+```{r, eval=TRUE, echo=FALSE}
+students %>% 
+  ggplot(aes(x=Mjob, y = G_mat)) +
+  geom_boxplot(aes(fill = Mjob)) +
+  scale_fill_viridis(discrete=TRUE) +
+  # stat_summary(fun.data=mean_se, geom="errorbar", color="black", width=0.2) +
+  theme_minimal()
+```
+
+```{r, eval=TRUE, echo=FALSE}
+students %>% 
+  ggplot(aes(x=Mjob, y = G_mat)) +
+  geom_violin(aes(fill = Mjob)) +
+  geom_boxplot(aes(fill = Mjob), width=.1) +
+  scale_fill_viridis(discrete=TRUE) +
+  theme_minimal()
+```
