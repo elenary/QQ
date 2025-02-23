@@ -1,0 +1,266 @@
+---
+format:
+  html:
+    theme: cosmo
+    self-contained: true
+---
+
+## Testing hypotheses
+
+It's time to move on to what we spent last semester studying statistics for: hypothesis testing.
+
+I collected all the new columns we created into one dataset so that we could use them if needed.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+library(tidyverse)
+whr <- read_csv("2016.csv") # read data sheet 
+
+whr %>%
+  mutate("top20" = ifelse(`Happiness Rank`<=20, "hehe", "not hehe"),
+         "mean_position" = ifelse(`Happiness Score`>= mean(`Happiness Score`, na.rm = TRUE), "upper", "lower")) -> whr
+```
+
+Before applying statistical tests, it is worth reviewing the section on [statistical inference in its entirety](https://elenary.github.io/StatsForDA/inference.html#inference) and [the hypothesis testing algorithm in particular](https://elenary.github.io/StatsForDA/inference.html#nhst) . We do not apply tests straight away! First, we must have a meaningful hypothesis, an understanding of what the $H_0$ and $H_1$, the selected significance levelααand calculated based on statistical $power$ the required amount of data. Here we are working with ready-made data, so we cannot influence the amount of data, but we must take into account all other points.
+
+### Correlation test
+
+The first thing we'll practice with is [a correlation test .](https://elenary.github.io/StatsForDA/stats_criteria_linear.html#corr_test)
+
+First, we check the assumptions for the applicability of the correlation test
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+library(tidyverse)
+whr <-read_csv("2016.csv")
+
+#Check linearity of relationship
+whr %>%
+  ggplot(aes(x = Family, y = `Happiness Score`)) +
+  geom_point(color = "#355C7D") +
+  theme_minimal()
+
+# check distributioins
+
+whr %>%
+  ggplot(aes(x = Family, y = `Happiness Score`)) +
+  geom_point(color = "#355C7D") +
+  theme_minimal()
+
+whr %>%
+  ggplot(aes(x =`Happiness Score`)) +
+  geom_density(color = "#355C7D") +
+  theme_minimal()
+
+whr %>%
+  ggplot(aes(x =Family)) +
+  geom_density(color = "#355C7D") +
+  theme_minimal()
+
+
+whr %>%
+  ggplot(aes(sample = Family)) +
+  stat_qq(color = "#355C7D") +
+  geom_qq_line() +
+  theme_minimal()
+
+# We can see that variable Family distributed not exactly normally, so we will use Spearman correlatoin instead of Pearson
+
+cor.test(whr$`Happiness Score`, whr$Family, method = "spearman")
+
+whr %>%
+  ggplot(aes(x = Freedom, y = `Happiness Score`)) +
+  geom_point(color = "#355C7D") +
+  theme_minimal()
+
+whr %>%
+  ggplot(aes(x = Freedom)) +
+  geom_density(color = "#355C7D") +
+  theme_minimal()
+
+
+whr %>%
+  ggplot(aes(sample = Freedom)) +
+  stat_qq(color = "#355C7D") +
+  geom_qq_line() +
+  theme_minimal()
+
+# But here we can use Pearson correlation
+cor.test(whr$`Happiness Score`, whr$Family, method = "pearson")
+```
+
+
+How to interpret this? Let's recall everything we learned about statistical criteria last semester.
+
+By the way, in programming languages, numbers are often written using exponential notation ase-10e-10– this is convenient for the mathematical view, which digit comes first after a set of zeros, but inconvenient for interpretation. To remove it, you can perform the operation anywhere in P
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+options(scipen = 999)
+```
+
+Correlation matrices
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+
+# корреляция по простому
+whr %>%
+  select(c(`Happiness Score`:Generosity, -`Upper Confidence Interval`, -`Lower Confidence Interval`)) %>%
+  cor(method = "spearman") %>%
+  round(2) 
+
+library("Hmisc")
+
+whr %>%
+  select(c(`Happiness Score`:Generosity, -`Upper Confidence Interval`, -`Lower Confidence Interval`)) %>%
+  as.matrix() %>%
+  rcorr() -> whr_cor
+
+whr_cor$r
+
+library(corrplot)
+
+corrplot(whr_cor$r, method="circle")
+# corrplot(whr_cor$r, p.mat = whr_cor$P, sig.level = 0.05, insig = "blank")
+heatmap(whr_cor$r)
+```
+
+### T-test
+
+Now let's test the hypothesis that happiness levels `Happiness Score`differ in Eastern and Western Europe. To do this, we first need to filter out only the data that correspond to regions `Central and Eastern Europe`and `Western Europe`. This is the very stage of data preprocessing, when we need to prepare the data before applying statistical tests.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>%
+  filter(Region == "Central and Eastern Europe" | Region == "Western Europe") -> whr_ttest
+```
+
+We follow [the NHST algorithm](https://elenary.github.io/StatsForDA/inference.html#nhst) : formulate the null and alternative hypotheses, select the significance level, reach the choice of statistical test, and select the t-test. Now [we check the assumptions for the t-test](https://elenary.github.io/StatsForDA/stats_criteria_ttest_anova.html#ttest)
+
+For the t-test, it is important for us to assume that the salaries are distributed normally or close to normally (the distribution is generally symmetrical, there are no special outliers). Let's check this.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+# skimr::skim(whr$`Happiness Score`)
+
+whr_ttest %>%
+  ggplot(aes(x =`Happiness Score`)) +
+  geom_density(color = "#355C7D") +
+  theme_minimal()
+
+whr_ttest %>%
+  ggplot(aes(sample = `Happiness Score`)) +
+  stat_qq(color = "#355C7D") +
+  geom_qq_line() +
+  theme_minimal()
+```
+
+Based on this picture, we can generally assume that the salaries `Happiness Score`are distributed close to the normal distribution. This means that we can skip the nonparametric analogs of the t-test and conduct the most common t-test!
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+t.test(`Happiness Score` ~ Region, data = whr_ttest, alternative = "less", paired = FALSE, conf.level = 0.95)
+
+t.test(`Happiness Score` ~ Region, data = whr_ttest, alternative = "two.sided", paired = FALSE, conf.level = 0.95)
+
+```
+
+The argument `alternative`specifies what our alternative hypothesis (the opposite of the null) is: that the means in the groups are simply *not equal* , or that the mean in one group *is smaller or larger* than the other. The argument `paired`specifies whether to perform a dependent t-test (when we use the same sample and make several measurements on it). In this case, we have independent samples, and a dependent t-test is not needed.
+
+How to interpret these results? The first thing we look at is the p-value (column Pr(F)). If it is less than the set levelαα, then we say that *we reject the null hypothesis and we have obtained statistically significant differences* . If the p-value is greater than or equal toαα– *we do not have enough evidence to support the alternative hypothesis, and we say that we do not reject the null hypothesis* .
+
+What's good about the %\>% notation is that we can filter the data and do a t-test right inside one pipe! Using the same example, only now we'll filter the data right away and do a t-test on the filtered data, without creating a separate dataset `whr_ttest`:
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>% 
+  filter(Region == "Central and Eastern Europe" | Region == "Western Europe") %>% 
+  t.test(`Happiness Score` ~ Region, data = ., alternative = "less", paired = FALSE, conf.level = 0.95)  # put "." where the result of the previous line (data) should be
+  
+```
+
+Please note that in the t.test function the data is not in the first place, as we need it to use the pipe notation. But this is quite easy to solve: in any function, in order to use it inside a pipe, you need to put a dot in the place where we want to pass the result of the previous line of the pipe.
+
+Sometimes it is easier to do more actions, but sequentially, so it may be useful to know another way to write a t-test and its non-parametric analogues - not by specifying variables from the data (note - we explicitly set the argument `data`), but without specifying the data, simply passing it two vectors (I rarely use this format of writing, but not because it is worse - I do this to save time, and so as not to get confused in the variables I created while working on the textbook):
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+# Фильтруем только те регионы, которые будем проверять
+
+whr %>%
+  filter(Region == "Central and Eastern Europe") %>%
+  select(`Happiness Score`) %>%
+  pull() -> whr_CEE
+
+whr %>%
+  filter(Region == "Western Europe") %>%
+  select(`Happiness Score`) %>%
+  pull() -> whr_WE
+
+var(whr_CEE)
+var(whr_WE)
+
+t.test(whr_CEE, whr_WE, alternative = "less", paired = FALSE, conf.level = 0.95)
+
+t.test(whr_CEE, whr_WE, alternative = "less", paired = FALSE, var.equal = FALSE)
+
+t.test(whr_CEE, whr_WE, alternative = "two.sided", paired = FALSE)
+```
+
+Let's build visualizations
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr_ttest %>%
+  ggplot(aes(x=Region, y = `Happiness Score`)) +
+  geom_boxplot() +
+  theme_minimal()
+
+# install.packages("viridis")
+# install.packages("wesanderson")
+library(viridis)
+library(wesanderson)
+
+whr_ttest %>%
+  ggplot(aes(x=Region, y = `Happiness Score`, fill = Region)) +
+  geom_boxplot() +
+  theme_minimal() +
+  scale_fill_viridis_d()
+
+whr_ttest %>%
+  ggplot(aes(x=Region, y = `Happiness Score`, fill = Region)) +
+  geom_boxplot() +
+  theme_minimal() +
+  scale_fill_manual(values = wes_palette("Moonrise3"))
+
+whr_ttest %>%
+  ggplot(aes(x=Region, y = `Happiness Score`, fill = Region)) +
+  geom_violin() +
+  theme_minimal() +
+  scale_fill_manual(values = wes_palette("Moonrise3"))
+```
+
+**Nonparametric analogues of the t-test**
+
+What if our assumptions about the normality of the salary were not justified? If there were obvious outliers in the distribution, it would be strongly asymmetrical and skewed? Then we would need to conduct non-parametric analogues of the t-test - the Wilcoxon or Mann-Whitney test. Let's look at them using the example of checking that the social support indicator `Family`differs in these regions *(in fact, in reality, it would most likely be possible to conduct a regular t-test here - but there were no more crooked variables in this data, so we will look at the use of non-parametric analogues on them.*
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr %>%
+  ggplot(aes(x =Family)) +
+  geom_density(color = "#355C7D") +
+  theme_minimal()
+
+whr %>%
+  ggplot(aes(sample = Family)) +
+  stat_qq(color = "#355C7D") +
+  geom_qq_line() +
+  theme_minimal()
+
+# Все то же самое -- но функция называется не t.test(), a wilcox.test()
+
+wilcox.test(whr_ttest$Family ~ whr_ttest$Region, alternative = "less", paired = FALSE, conf.level = 0.95)
+
+whr_ttest %>%
+  ggplot(aes(x=Region, y = Family, fill = Region)) +
+  geom_boxplot() +
+  theme_minimal() +
+  scale_fill_manual(values = wes_palette("Moonrise3"))
+```
+
+
+## Assignments after the seminar 4
+
+1.  On the WHR dataset, conduct at least one correlation test for the entire NHST algorithm: select suitable variables, formulate a hypothesis, formulate H_0 And H_1, select level α, preprocess the data if necessary, and run a correlation test at the chosen significance level. Interpret the results: was the hypothesis confirmed?
+
+2.  On the WHR dataset, conduct at least one t-test or its nonparametric analogue using the entire NHST algorithm: select the appropriate variables, formulate a hypothesis, formulate H_0 And H_1, select level α, determine whether the samples are dependent or independent, preprocess the data if necessary, and perform a mean comparison test at the chosen significance level. Interpret the results: was the hypothesis confirmed?

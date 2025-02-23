@@ -1,0 +1,156 @@
+---
+format:
+  html:
+    theme: cosmo
+    self-contained: true
+---
+
+## Visualizations
+
+We have already built simple visualizations - a simple histogram and a simple probability density graph using basic R.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+library(tidyverse)
+whr_new <-read_csv("2016-2.csv")
+plot(density(whr_new$`Happiness Score`, na.rm = TRUE))
+hist(whr_new$`Happiness Score`)
+```
+
+These visualizations are correct, but they are standard and do not look very nice. Meanwhile, visualizations are very important - the clarity of the data presentation depends on their quality, and you can even manipulate data with visualizations. Scripting languages ​​have a huge number of tools for working with visualizations. In Python, these are `matplotlib`. And now welcome to `ggplot2`the universe of graphs in R <https://ggplot2.tidyverse.org/>
+
+For example, you can draw [a graph](https://www.google.com/url?sa=i&url=https%3A%2F%2Fadrienne-marshall.github.io%2Fggplot2_workshop%2F&psig=AOvVaw1y2l2bObt_HK2KcP7m_73h&ust=1676402334991000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCNihzL-bk_0CFQAAAAAdAAAAABAJ) like this , or [like this](https://edaoud.com/assets/img/articles/maps-ggplot2/map_1.png) . All this is achieved by means of the package `ggplot2`, which is already integrated into `tidyverse`.
+
+**“gg”** in the package name means **Grammar of graphics** . You can read more about it, for example, from Ivan Pozdniakov <https://pozdniakov.github.io/tidy_stats/230-ggplot2.html>
+
+The principle consists of drawing the graph in layers. Mandatory layers:
+
+-   data
+
+-   aesthetics (aes) or mapping – how our data is “stretched” onto the graph
+
+-   geoms – geometric objects that we will draw (for example, a histogram or barplot)
+
+Auxiliary layers:
+
+-   statistics (stats) – is it necessary to calculate some aggregated statistics directly on the graph
+
+-   coordinate system (coord) - you can rotate the coordinate system by 90 degrees or even replace it with polar
+
+-   themes (theme) – design systems, one of the most pleasant
+
+<p align="center"> 
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="80%"}
+knitr::include_graphics("images/gglayers.png")
+```
+Image from [The Grammar of Graphics](https://link.springer.com/book/10.1007/0-387-28695-0)
+
+ggplot integrates well with tiedivers, but it appeared, took shape and spread earlier, so instead of the pipe icon `%>%`there is `+`. Let's draw the same histogram, but more beautifully:
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr_new %>% 
+  ggplot(aes(x = `Happiness Score`)) +
+  geom_histogram() +
+  theme_minimal()
+
+# We can tailore size of a bin
+
+whr_new %>% 
+  ggplot(aes(x = `Happiness Score`)) +
+  geom_histogram(binwidth = 0.5) +
+  theme_minimal()
+```
+
+We can change colors of two things: fill and outline, as usual for shapes in PowerPoint or Word. For fill, use the fill argument, for outline – color. Some geoms have only outline – like, for example, scatter plot, since points have no fill.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+# fill in pink, line color (color) in violet
+# we can use not only words like pink и violet, but also codes in 16-th system, like "#355C7D"
+whr_new %>%
+  ggplot(aes(x =`Happiness Score`)) +
+  geom_histogram(fill = "pink", color = "violet", binwidth = 0.5) +
+  theme_minimal()
+
+# add 50% transparancy
+whr_new %>%
+  ggplot(aes(x =`Happiness Score`)) +
+  geom_histogram(fill = "pink", color = "violet", alpha = 0.5, binwidth = 0.5) +
+  theme_minimal()
+```
+
+Let's plot a similar probability density graph
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr_new %>% 
+  ggplot(aes(x = `Happiness Score`)) +
+  geom_density() +
+  theme_minimal()
+
+# drow a violet line
+whr_new %>%
+  ggplot(aes(x =`Happiness Score`)) +
+  geom_density(color = "violet") +
+  theme_minimal()
+
+# поменяем тип линии на пунктир (соответствие типов линий и кодов
+# можно погуглить или посмотреть в читшите)
+whr_new %>%
+  ggplot(aes(x =`Happiness Score`)) +
+  geom_density(color = "violet", linetype = 5) +
+  theme_minimal()
+
+#добавили заливку и прозрачность
+whr_new %>%
+  ggplot(aes(x =`Happiness Score`)) +
+  geom_density(color = "violet", fill = "pink", linetype = 5, alpha = 0.5) +
+  theme_minimal()
+```
+
+All of these graphs were descriptive - to study one variable. Now let's create a scatterplot, which shows the distribution of one variable as a function of the values ​​of another.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr_new %>%
+  ggplot(aes(x = `Happiness Score`, y = Freedom)) +
+  geom_point() +
+  theme_minimal()
+```
+
+And we can even color the points on this graph depending on the values ​​of the third variable! For example, the region. Everything is exactly the same as with colors before: if we want to fill the figure depending on the values ​​of the third variable, then the fill argument is used for coloring, if we color the outline, then color (like the outline and fill in Word or PowerPoint). But with the difference that now the fill color is set **inside the aesthetic** , since this is still about “pulling an owl onto a globe”, that is, our data on the graph.
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+whr_new %>%
+  ggplot(aes(x = `Happiness Score`, y = Freedom, color = Region)) +
+  geom_point() +
+  theme_minimal()
+```
+
+There are a huge number of additional things for more beautiful visualizations in ggplot to do something truly incredible. Of course, we will not have time to get acquainted with them within the course, but here, for example, is an additional package with palettes made based on Wes Anderson's films:) If we want to color our graph not just in the default colors, but in some special ones - there is a package in which color schemes from these films are collected! First, you need to put it through the usual way `install.packages()`, connect through `library()`, and then add one line with the addition of a scale `scale_fill_manual()`or `scale_color_manual()`- again, depending on whether we want to do a fill with these palettes or an outline.
+
+```{r}
+# install.packages("wesanderson")
+library(wesanderson)
+
+whr_new %>% 
+  filter(Region %in% c("Western Europe", "Eastern Asia", "Sub-Saharan Africa")) %>% #здесь я фильтрую часть строк, входящих только в три региона, чтобы на графике были только три цвета и не было цветового взрыва, так как регионов в данных много
+  ggplot(aes(x = `Happiness Score`, y = `Trust (Government Corruption)`,
+             fill = Region)) +
+  geom_boxplot() +
+  theme_minimal() +
+  scale_fill_manual(values = wes_palette("Royal1"))
+```
+
+## Assignments after the seminar 3 {#tasks_sem3}
+
+The dataset is used for tasks[`2016-2`](https://raw.githubusercontent.com/elenary/StatsForDA/main/2016-2.csv)
+
+1.  Follow all the examples in this section to make sure everything works correctly.
+
+2.  Calculate how many NAs are in columns `Economy (GDP per Capita)`, `Family`, `Health (Life Expectancy)`, `Freedom`, `Trust (Government Corruption)`, `Generosity` *(the task can be done in different ways, any one that gives the correct answer will do)*
+
+3.  Calculate descriptive statistics for the `Economy (GDP per Capita)`, , columns `Family`: `Freedom`mean, median, mode, standard deviation, variance, and interquartile range, and *(for those working in R only)* calculate values ​​for quartiles 1 and 3. Answers should be different from `NA` *(one way to find out values ​​by quartile is, for example, using separate common functions for descriptive statistics)* .
+
+4.  Using the column with values ​​and , created in [the previous homework](https://elenary.github.io/StatsForDA/R_analysis.html#tasks_sem3) , depending on the values ​​, calculate the mean and standard deviation within these groups ( and ) for the columns , , . *(Only for those working in R)* Compare the obtained mean values ​​with the values ​​for the 1st and 3rd quartiles from the previous task. What can you say about them?`upperlowerHappiness ScoreupperlowerEconomy (GDP per Capita)FamilyFreedom`
+
+5.  Plot probability density plots for variables `Family`and `Freedom`, *(only for those working in R)* using at least 2 non-default settings (theme, color, line type, transparency, etc.) Examples can be googled or viewed in [the cheatsheet](https://github.com/rstudio/cheatsheets/blob/main/data-visualization.pdf)
+
+6.  Create a scatterplot for variable `Family`by variable `Freedom`and *(for those working in R only)* color the dots based on the values ​​of the upper and lower variable you created in the last homework.
+
+7.  Calculate the correlation coefficient between variables `Family`and `Freedom`
