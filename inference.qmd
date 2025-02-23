@@ -160,7 +160,7 @@ The method used here is a correlational study. If there were any other manipulat
 
 Empirical hypothesis 1 might sound like this:`families in cities spend less time comparatively with families in rural areas`
 
-Empirical hypothesis 2:`studens evaluatiin their relationship with parents as less supportive (variable famrel, less supportive coded as 1-2), drink more alcohol (variable Walc, values 4-5)`
+Empirical hypothesis 2:`studens evaluating their relationship with parents as less supportive (variable famrel, less supportive coded as 1-2), drink more alcohol (variable Walc, values 4-5)`
 
 Empirical hypothesis 3`Studens with more absences will have less grade (avarage amoung G1_mat, G2_mat, G3_mat или G1_por, G2_por, G3_por -- small values)`
 

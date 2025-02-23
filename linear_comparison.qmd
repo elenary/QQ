@@ -1,0 +1,454 @@
+---
+format:
+  html:
+    theme: cosmo
+    self-contained: true
+---
+
+# Checking the linear link
+
+```{r, eval=TRUE, echo = FALSE, message = FALSE}
+library(tidyverse)
+library(kableExtra)
+library(viridis)
+studens_mat <- read_csv("student-mat.csv") %>% 
+  rename_with(., ~ paste0(., "_mat"), .cols = c(absences, paid, G1, G2, G3)) -> studens_mat 
+studens_por <- read_csv("student-por.csv") %>% 
+  rename_with(., ~ paste0(., "_por"), .cols = c(absences, paid, G1, G2, G3)) -> studens_por
+studens_mat %>% 
+  full_join(studens_por, by = c("school","sex","age","address","famsize","Pstatus","Medu","Fedu",
+                             "Mjob","Fjob","reason", "guardian", "traveltime","studytime", "failures", "schoolsup", "famsup",
+                             "activities", "nursery", "higher", "internet", "romantic", "famrel", "freetime", "goout", 
+                             "Dalc", "Walc", "health")) -> students 
+
+students %>% 
+  mutate("student" = paste0("id", row_number()), .before = "school")  %>% 
+  drop_na() %>% 
+  mutate(G_mat = rowMeans(dplyr::select(., c(G1_mat, G2_mat, G3_mat))),
+         G_por = rowMeans(dplyr::select(., c(G1_por, G2_por, G3_por)))) %>% 
+  mutate(absences_mat_groups = ifelse(absences_mat <=5, "less", ifelse(absences_mat <=15, "middle", "more"))) %>% 
+  mutate(absences_por_groups = ifelse(absences_por <=5, "less", ifelse(absences_por <=15, "middle", "more"))) -> students
+```
+
+Before this, we considered types of statistical analysis when it was necessary to compare average values ​​in several groups. The dependent variable was always quantitative (we compared its average value across groups), and the independent variable was categorical, took a finite number of values, and each of its values was a separate IV level, a separate group.
+
+Now we turn to statistical tests that are used when both variables, DV and IV, are quantitative.
+
+## Correlation analysis
+
+**Correlation** is a relationship between variables. Although it has the same name as one of the two types of relationships between variables, correlation can be identified using basically any type of analysis – after all, when we get the results of statistical tests, we only understand that two variables are related (or not), but we cannot conclude whether this is a cause-and-effect relationship or a correlation.
+
+Here we will talk specifically about **correlation analysis** – a special type of analysis for determining the significance of a linear relationship between only two quantitative or ordinal variables.
+
+To derive the formula and meaning of correlation, let's get acquainted with the concept of covariance.
+
+**Co-variance** is a measure of the co-variability of data, an indicator of how observations on two quantitative variables vary relative to each other.
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="70%"}
+knitr::include_graphics("images/correlation.jpeg")
+```
+[pic from here](https://angelgardt.github.io/SFDA2022/book/twoway-anova.html#factor_interaction)
+
+<p align="center"> $\text{cov}(x,y)=\frac{\sum_{i=1}^n (x_i - \bar x) (y_i - \bar y )}{n-1}$</p>
+
+
+*Shock content: try to calculate the covariance of a variable with itself and look at the resulting formula: does it remind you of anything?*
+
+<div>
+<details>
+<summary>*Covariance with itself*</summary>
+<p align="center"> $\text{cov}(x,x)=\frac{\sum_{i=1}^n (x_i - \bar x) (x_i - \bar x )}{n-1} = \frac{\sum_{i=1}^n (x_i - \bar x )^2}{n-1}$</p>
+
+This is variance!
+
+</details>
+</div>
+
+**The correlation coefficient** is an indicator of the strength and direction of the relationship between variables. The magnitude of the number is responsible for the strength of the relationship, and the sign of the correlation is responsible for the direction. In essence, this is the covariance of variables, but weighted by the standard deviations of these variables. This is done in order to standardize the coefficient, move from absolute values ​​to relative ones, and place this coefficient within the limits of \[-1;1\]. For the Pearson correlation coefficient (correlation of two quantitative variables):
+
+<p align="center"> $\text{corr}(x,y) = r_{xy} = \frac{\text{cov(x, y)}}{sd_x sd_y} = \frac{\sum_{i=1}^n (x_i - \bar x) (y_i - \bar y )}{(n-1)sd_x sd_y}$</p>
+
+**The coefficient of determination** is an indicator of the extent to which the variability of the data is explained by this selected independent variable. If we have only one NP, then the coefficient of determination is practically the same as the correlation, only taken squared:
+
+<p align="center"> $R^2 = r_{xy}^2 = \frac{\text{cov(x, y)}}{sd_x sd_y} = \frac{\sum_{i=1}^n (x_i - \bar x) (y_i - \bar y )}{(n-1)sd_x sd_y}$</p>
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="50%"}
+knitr::include_graphics("images/correlation2.png")
+```
+Example from the site <https://rpsychologist.com/correlation/>
+
+Guess the Correlation Game: <http://guessthecorrelation.com/>
+
+### Correlation test
+
+Hypotheses about the presence of a linear relationship between variables are tested using a correlation test. This is exactly the same statistical criterion as those we have already discussed. In essence, it is exactly the same as linear regression with one variable. The correlation test is used when both the PP and NP are quantitative variables or expressed in an ordinal scale (but not a nominative one). For a quantitative scale, the Pearson correlation coefficient is usually used, for an ordinal or quantitative variable with a small number of observations - the Spearman correlation coefficient.
+
+The correlation test uses – you won’t believe it – the already familiar Student’s T-distribution! ( *that is, we only need to remember two distributions: the T-distribution and the F-distribution* )
+
+The number of degrees of freedom is calculated using the formula
+
+<p align="center">$df = n - 2$, n – number of observations </p>, 
+
+Null and alternative hypotheses for the correlation test:
+
+<p align="center">$H_0$: $r_{xy} = 0$ </p>
+<p align="center">$H_1$: $r_{xy} \neq 0$ </p>
+
+Like other criteria, it has assumptions.
+
+### Assumptions for the Correlation Test
+
+(DV and IV are measured on a quantitative or ordinal scale)
+
+1.  The distribution of NP by PP is linear - there is no picture of non-linear relationships or clusters of data in different places.
+
+2.  The salary is normally distributed (not necessarily strictly consistent) and there are no noticeable outliers - this check was discussed [here](https://elenary.github.io/StatsForDA/stats_criteria.html#param_nonparam)
+
+Examples of what a nonlinear distribution might look like:
+
+<p align="center"> 
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="100%"}
+knitr::include_graphics("images/Correlation_examples2.svg.png")
+```
+
+### Nonparametric analogues
+
+If the PP deviates greatly from the normal distribution, or the sample is small, or the PP is coded on an ordinal scale, the correlation test uses the Spearman correlation coefficient instead of the Pearson, and this is the only difference.
+
+There is also Kendall's tau, which is almost the same as Spearman's correlation, but we will not consider it, since it is used extremely rarely.
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="70%"}
+knitr::include_graphics("images/scheme-corr.png")
+```
+
+### Calculating the Correlation Test
+
+Let's test the following hypothesis.
+
+> `studens evaluating their relationship with parents as less supportive (variable famrel, less supportive coded as 1-2), drink more alcohol (variable Walc, values 4-5)`
+
+```{r eval=TRUE, echo = FALSE, message = FALSE}
+kable(students[1:10,]) %>% scroll_box(width = "100%") 
+```
+
+Let's also follow the algorithm.
+
+DV – ordinal, IV – ordinal. Actualy, in this design they are not depedent and independent anymore -- because this design is not experimental and do not assume causal relatioinhip. Our hypothesis is not about comparing groups with each other, but that these variables correlate, there is a linear relationship between them.
+
+Since the both variables are ordinal, I need to use a nonparametric analogue of Pearson correlation - Spearman rank correlation (or ordinal logistic regression (if I want the relationship to have predictive power), but that's not the topic of this article).
+
+```{r, eval=TRUE,  message = FALSE, warning= FALSE}
+cor.test(students$famrel, students$Walc, method = 'spearman')
+```
+
+If we had two quantitative variables, we would simply visualize them with a scatterplot with the now familiar line in the middle of the dots. For example, like this:
+
+<p align="center"> 
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="60%"}
+knitr::include_graphics("images/scatterplot.png")
+```
+[from here](https://angelgardt.github.io/SFDA2022/book/correlations.html)
+
+But we have two ordinal variables, so the scatterplot will give an unclear variant. Therefore, we will use a mosaic plot: the size of the tile reflects the frequency of coincidence of such values ​​of two variables.
+
+
+```{r corr mosaic, eval=TRUE, echo = FALSE, message = FALSE, warning= FALSE, fig.align = 'center', out.width="60%"}
+library(ggmosaic)
+students %>% 
+  ggplot(aes()) + 
+  geom_mosaic(aes(x = product(famrel), fill = Walc)) +
+  scale_fill_viridis(discrete=TRUE) +
+  theme_minimal() 
+```
+
+Another option is hitmap, where the dimensions are fixed and the color is responsible for the frequency of matches.
+
+```{r corr heatmap, eval=TRUE, echo = FALSE, message = FALSE, warning= FALSE, fig.align = 'center', out.width="60%"}
+students %>% 
+  ggplot(aes(x = as.factor(famrel), y = as.factor(Walc))) + 
+  geom_bin2d() +
+  scale_fill_viridis() +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
+```
+
+### Interpretation of results
+
+When we interpret the results of a correlation test, we are usually interested in the value of the statistic (the t-value or F-value), the p-value, and the effect size. For a correlation test, the value of the statistic is the t-value, but it is usually not the t-value that is used, but the correlation coefficient between the variables x and y $r_xy$– it is also the effect size, an indicator of the magnitude of differences. The correlation test is the only test where we do not need an additional metric about the effect size (for example, Cohen's d), and we judge the strength of the differences by the coefficient itself.
+
+In the example above, we got r = -0.13. In the correlation coefficient, we look at two parameters: the sign and the modulus of the number. Here we have a negative correlation, that is, the relationship will be inverse: with an increase in one variable (for example, the assessment of the quality of family relationships `famrel`), the second variable (frequency of alcohol consumption `Walc`) will decrease. 0.13 in modulus is a small number, this is a fairly weak correlation (you can check the breakdown by size in the section on [effect sizes](https://elenary.github.io/StatsForDA/inference.html#sample_size) ).
+
+It is important that with a very large sample, even a very weak correlation will reach statistical significance! Therefore, do not get carried away with correlation tests to find connections between everything and everything: you will definitely find it, and it will even be significant. As you can see, even r=0.1 can reach the threshold of statistical significance.
+
+It is worth looking for a correlation between meaningful variables: since it can be significant with large samples, it may turn out that the number of films starring Nicolas Cage and the number of suicides by drowning are correlated - obviously, these values ​​are not related to each other, and the correlation here is random. You can look at strange correlations on the website <https://tylervigen.com/view_correlation?id=12692>
+
+Another important point is that in a correlation test, even with a perfectly designed experiment, we will not be able to conclude a cause-and-effect relationship. But it is not the theoretical possibility of concluding a cause-and-effect relationship and the methods of statistical analysis that are important: like warm and red, they refer to different things. The possibility of concluding is determined by the design of the study, not the statistical test. If we have a well-conducted controlled experiment, and the 3 conditions for establishing a cause-and-effect relationship are met ( [we discussed this here](https://elenary.github.io/StatsForDA/inference.html#relationship) ), then we can conclude it. At the same time, the use of the same ANOVA may not be related to the experiment, and we will still conclude about the correlation (associative) relationship.
+
+<p align="center"> 
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="80%"}
+knitr::include_graphics("images/corr_causation.png")
+```
+</p>
+
+### Correlation matrices
+
+Correlation matrix analysis is often used – when correlations are calculated pairwise for each matrix of variables. This can be found, for example, in the correlation of questionnaires: let's say there is questionnaire O1 and O2. Questionnaire O1 has subscales C11, C12, C13, C14, C15, and O2 has correspondingly C21, C22, C23, C24, C25. Then we can construct a correlation matrix for the subscales of these questionnaires.
+
+<p align="center"> 
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="70%"}
+knitr::include_graphics("images/corrplot.png")
+```
+</p>
+
+## Linear Regression Analysis
+
+**Linear regression analysis** is exactly the same as the ANOVA (analysis of variance) we know, only if we replace categorical NP with quantitative ones!
+
+Linear regression itself is a straight line that we try to draw through all our points in such a way that it captures the largest number of them. In essence, this is the same as correlation, only a more powerful tool - here we can enter several NPs.
+
+<p align="center"> 
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="90%"}
+knitr::include_graphics("images/anova_to_regression.png")
+```
+</p>
+
+Regression analysis is a pretty powerful thing, because here for the first time we start talking about *the predictive function* of the analysis. It turns out that regression analysis can be used:
+
+-   To test hypotheses about the presence of a linear relationship between quantitative or ordinal variables
+
+-   To predict salary values ​​beyond the available data
+
+For now, we are interested in the first of these functions, although very often linear regression analysis is interesting precisely from the point of view of the second.
+
+Regression analysis is based on the construction of a regression line: any line has the form $y = kx + b$, in regression analysis this equation is often written as $y = b_0 + b_1x$. And the task of regression analysis is to determine and test the coefficients $b_0$ and $b_1$ linear regression.
+
+### Regression coefficients
+
+The equation of the regression line we have drawn is:
+
+<p align="center">$\hat y = b_o + b_1x$ </p>
+
+We see that most of the points do not fit the line perfectly - there is still some distance along the y-axis to the point itself. Therefore, if we write down the equation for each point using the regression line equation, it will look like this:
+
+<p align="center">$y = b_o + b_1x + e$ </p>
+
+The distance along the y-axis that remains to the points after we have drawn a straight line through them is called **residuals** – that is, these are the differences between the original data and those described by our model (line), what “remains”:
+
+<p align="center">$e = y - \hat y$</p>
+
+Note that when we talk about the equation of a straight line, we denote y as $\hat y$, and when we talk about actual points, we will simply denote it $y$.
+
+The regression line is often also called **a model** . The equation of the regression line with each new coefficient is a new model.
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="70%"}
+knitr::include_graphics("images/lr.png")
+```
+
+-   Coefficient $b_1$ answers the slope of the **line**
+
+-   Coefficient $b_0$ is responsible for the displacement of the line along the y-axis **(intercept)**
+
+The coefficients are calculated in such a way that the sum of the squares of the residuals is minimal. This is called **the least squares method** .
+
+When constructing a regression line, we need to strive to reduce the sum of the residuals:
+
+<p align="center">$\sum_{i=1}^{n} e^2 = \sum_{i=1}^{n}(y - \hat y)^2$</p>
+
+The formulas for the coefficients using the least squares method are equal to:
+
+<p align="center">$b_{1_{xy}} = \frac{sd_y}{sd_x} r_{xy}$</p>
+
+<p align="center">$b_o = \bar y - b_{1_{xy}}\bar x$</p>
+
+When calculating the coefficients, the first one to be calculated is $b_1$, and it, as can be seen from the formula, depends on the magnitude of the variability of the data for the variables x and y (standard deviations or dispersions). **In the case of equal variability** $b_1$ **is the correlation coefficient** $r_{xy}$
+
+### Coefficient of determination and proportion of explained variability
+
+In linear regression, as in ANOVA, the coefficient of determination tells us **the percentage of variability explained** , that is, how well our regression model explains the variability in the dependent variable.
+
+As in ANOVA, the sum of squares SST consists of **the between-group** sum of squares (SSE, Sum of Squares Explained or SSB, Sum of Squares Between groups) and **the within-group** sum of squares (SSR, Sum of Squares Random or SSW, Sum of Squares Within groups).
+
+<p align="center">$SST = SSE + SSR$</p>
+
+<p align="center"> 
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="100%"}
+knitr::include_graphics("images/lr_sum_squares.png")
+```
+</p>
+
+The total variability is calculated from a line with a mean value of y.
+
+<p align="center">$SST = \sum_{i=1}^n (\bar y - y_i)^2$</p>
+
+From the picture you can see that
+
+<p align="center">$SSE = \sum_{i=1}^n (\bar y - \hat y_i)^2$</p>
+
+Residual variability:
+
+<p align="center">$SSR = \sum_{i=1}^n (y_i - \hat y_i)^2$
+
+To evaluate how good the model is, we again resort to the coefficient of determination:
+
+<p align="center">$R^2 = \frac{SSE}{SST} = 1 - \frac{SSR}{SST}$ </p>
+
+The coefficient of determination can be thought of as the size of the effect – and it is nothing more than the already familiar $\eta^2$!
+
+<p align="center">$\eta^2 = \frac{SSE}{SST}$ </p>
+
+In linear regression analysis, the coefficient of determination is also considered as the degree of correlation between the initial values ​​of the variable $y$ and predicted $\hat y$. And as we remember, it is equal to the square of the correlation between the initial values ​​of the variable $y$ and predicted $\hat y$:
+
+<p align="center"> $R^2 = r_{xy}^2 = \frac{\text{cov(x, y)}}{sd_x sd_y} = \frac{\sum_{i=1}^n (x_i - \bar x) (y_i - \bar y )}{(n-1)sd_x sd_y}$</p>
+
+### Regression analysis (testing regression coefficients)
+
+Regression analysis is an interesting thing, as it consists of several layers that take something from ANOVA, and something from correlation analysis. Testing the significance of the coefficients is carried out on the basis of a criterion belonging to the T-distribution family, just like correlation analysis. And testing the entire model is carried out using the F-criterion, just like ANOVA. In regression analysis, we are more interested in testing the significance of the coefficients - since it is by the coefficients with which the factors in the model are taken that we determine whether the influence of these factors is significant.
+
+The number of degrees of freedom is calculated using the formula:
+
+<p align="center">$df = n - 2$, n – number of observations </p>
+
+Model equation:
+
+<p align="center">$\hat y = b_o + b_1x$ </p>
+
+Null and alternative hypotheses:
+
+<p align="center">$H_0$: $b_{1_{xy}} = 0$ </p>
+<p align="center">$H_1$: $b_{1_{xy}} \neq 0$ </p>
+
+The key statistic for the coefficients is the T-value, it is calculated using the formula:
+
+<p align="center">$T = \frac{b_1}{se}$</p>
+
+### Multiple Regression Analysis
+
+**Multiple regression analysis** – implies the same thing, only new predictors appear (independent variables, also known as factors)
+
+<p align="center">$\hat y = b_o + b_1x_1 + b_2x_2 + ... + b_nx_n$ </p>
+
+### Assumptions for Regression Analysis
+
+(Variables are measured on a quantitative or ordinal scale)
+
+1.  The distribution of variables is linear - there is no picture of non-linear relationships or clusters of data in different places.
+
+2.  The residuals vary approximately equally along the entire line – homogeneity (or homoscedasticity) of the residuals. It is most often tested using a diagnostic scatter plot with the distribution of residuals by the predicted values ​​(fitted values)
+
+3.  The residuals are normally distributed – the same as [here](https://elenary.github.io/StatsForDA/stats_criteria.html#param_nonparam) , only for the residuals (probability density plot for residuals or QQ-plot)
+
+4.  For multiple linear regression – absence of multicollinearity (strong correlation between independent variables). Checked using the VIF test (“variance inflation index”)
+
+Examples of diagnostic graphs for residues: <https://gallery.shinyapps.io/slr_diag/>
+
+### Calculating Regression Analysis
+
+When we run a regression analysis calculation, we end up with a table like this:
+
+|    Designation    |           Coefficient          | Statistic |     SE    |  p-value |
+|:-----------------:|:------------------------------:|:----------:|:---------:|:--------:|
+|             $b_0$ |            Intercept           |  $t_{b0}$  | $SE_{b0}$ | $p_{b0}$ |
+|             $b_1$ |        Коэф для фактора1       |  $t_{b1}$  | $SE_{b1}$ | $p_{b1}$ |
+| (если есть) $b_2$ |  (если есть) Коэф для фактора2 |  $t_{b2}$  | $SE_{b2}$ | $p_{b2}$ |
+| (если есть) $b_3$ |  (если есть) Коэф для фактора3 |  $t_{b3}$  | $SE_{b3}$ | $p_{b3}$ |
+
+Just like everywhere else, we are primarily interested in the value of the statistics (t-value), the level of significance (p-value) and here we are also interested in the value of the coefficients themselves. In the case of significance (p-value \< alpha), that is, obtaining the result that this factor significantly affects the variability of the data, and we can construct a regression line - we will write the equation of the regression line based on these values:
+
+^yy^= Intercept + Coefficient for factor1 \* Factor1 + Coefficient for factor2 \* Factor2 + Coefficient for factor3 \* Factor3
+
+<p align="center">$\hat y$ = Intercept + Coefficient for factor1 * Factor1 + Coefficient for factor2 * Factor2 + Coefficient for factor3 * Factor3</p>
+
+For example, let's take another dataset with Udemy course information.
+
+```{r, eval=TRUE, echo = FALSE, message = FALSE, warning= FALSE}
+udemy <- read_csv("Course_info.csv")
+udemy %>% 
+  select(!headline) -> udemy
+udemy_sample <- sample_n(udemy, 1000, replace = T)
+udemy_sample %>% 
+  filter(num_subscribers > 1 & price > 0 & content_length_min>0 & num_lectures>0) %>% 
+  mutate(price_log = log(price), num_subscribers_log = log(num_subscribers)) -> udemy_sample
+kable(udemy_sample[1:10,]) %>% scroll_box(width = "100%") 
+```
+
+And we will try to build a model of the cost of the course based on the number of students ( *you may not have noticed, but here we are getting very close to the real problems that data analysts solve* )
+
+Spoiler: since this is real data, we had to tinker with its preprocessing, and even after that, the best option for building a model looks like this: 
+
+```{r, eval=TRUE, echo = FALSE, message = FALSE, warning= FALSE}
+udemy_sample %>%
+  filter(price > 1 & price<200 & price_log > 3 & num_subscribers < 10000) %>% 
+  ggplot(aes(x=num_subscribers_log, y = price_log)) +
+  geom_point(aes()) +
+  geom_smooth(method="lm") +
+  theme_minimal()
+``` 
+
+It is obvious that the model will not work well here. Let's take another unsuccessful example for building regression models:
+
+```{r, eval=TRUE, echo = FALSE, message = FALSE, warning= FALSE}
+udemy_sample %>%
+  filter(num_subscribers > 0 & num_subscribers < 5000 & avg_rating >=3) %>% 
+  ggplot(aes(x=num_subscribers, y = avg_rating)) +
+  geom_point(aes()) +
+  geom_smooth(method="lm") +
+  theme_minimal()
+```
+
+
+Therefore, we will discard the idea of ​​predicting the price and rating for now and move on to something more prosaic – we will build a model of the course duration from the number of lectures.
+
+1.  Hypothesis: Duration `content_length_min`is determined by the number of lectures`num_lectures`
+
+<p align="center">`content_length_min` ~ `num_lectures`</p>
+
+2.  We formulate the null hypothesis:
+
+Coefficient $b_1$ for `num_lectures`should not be equal to zero (that is, `num_lectures`it affects the variability of the data)
+
+<p align="center">$H_0$: $b_{1_{xy}} = 0$ </p>
+<p align="center">$H_1$: $b_{1_{xy}} \neq 0$ </p>
+
+3.  Let's fix that we will test the hypothesis at the level $\alpha = 0.05$
+
+4.  Let's choose a statistical criterion for testing. Let's see how linearly distributed the variables and residuals are:
+
+```{r linreg final model, eval=TRUE, echo = FALSE, message = FALSE, warning= FALSE}
+udemy_sample %>% 
+  filter(content_length_min<300 & num_lectures<80) %>%  
+  ggplot(aes(x=num_lectures, y = content_length_min)) +
+  geom_point(aes(color = num_lectures)) +
+  geom_smooth(method="lm") +  
+  scale_color_viridis() +
+  theme_minimal()
+```
+
+Not the best option, but you can work with it *(why? how is it different from the previous picture?)*
+
+5.  We build a regression model and conduct a regression analysis, look at the significance of the coefficients
+
+```{r, eval=TRUE, echo = FALSE, message = FALSE, warning= FALSE}
+options(scipen=999)
+udemy_sample %>% 
+  filter(content_length_min<300 & num_lectures<80 & num_subscribers < 5000) -> udemy_model 
+model_length <- lm(udemy_model$content_length_min ~ udemy_model$num_lectures) 
+summary(model_length)
+```
+
+6.  Let's interpret the results: what is the p-value for the coefficient `num_lectures`? We see that it is very small and clearly less than the declared alpha level - that is, the coefficient is significant, our hypothesis that the number of lessons determines the course length has been confirmed, hurray! What is the value of the coefficient itself? About 2.16. That is, with an increase in the number of lessons by 1, the course length will increase by 2.16 minutes! What is $R^2$? It is equal to 0.19, which is not very much in general, but it is already a result. That is, 19% of the variability of our data on the course duration is determined by the number of lessons!
+
+I can now write the equation of the regression line as follows:
+
+<p align="center">$\hat content\_length\_min = 81.94 + 2.16 \times num\_lectures$ </p>
+
+Let's do the same analysis, but taking into account several factors (predictors). Let's assume that the course duration is also explained by the number of subscribers`num_subscribers`
+
+```{r, eval=TRUE}
+
+model_length2 <- lm(udemy_model$content_length_min ~ udemy_model$num_lectures + udemy_model$num_subscribers_log) 
+summary(model_length2)
+```
+
+
+What can be said about these results? Are both coefficients significant?

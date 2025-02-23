@@ -27,6 +27,7 @@ book:
     - inference.qmd
     - criteria.qmd
     - group_comparison.qmd
+    - linear_comparison.qmd
     - r_1.qmd
     - r_2.qmd
 
