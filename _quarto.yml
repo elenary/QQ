@@ -24,6 +24,7 @@ book:
     - distributions.qmd
     - descriptives.qmd
     - normdist.qmd
+    - inference.qmd
     - r_1.qmd
     - r_2.qmd
 

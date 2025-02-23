@@ -1,0 +1,497 @@
+---
+format:
+  html:
+    theme: cosmo
+    self-contained: true
+---
+
+```{r, eval=TRUE, echo = FALSE, message = FALSE}
+library(tidyverse)
+library(kableExtra)
+studens_mat <- read_csv("student-mat.csv") %>% 
+  rename_with(., ~ paste0(., "_mat"), .cols = c(absences, paid, G1, G2, G3)) -> studens_mat 
+studens_por <- read_csv("student-por.csv") %>% 
+  rename_with(., ~ paste0(., "_por"), .cols = c(absences, paid, G1, G2, G3)) -> studens_por
+studens_mat %>% 
+  full_join(studens_por, by = c("school","sex","age","address","famsize","Pstatus","Medu","Fedu",
+                             "Mjob","Fjob","reason", "guardian", "traveltime","studytime", "failures", "schoolsup", "famsup",
+                             "activities", "nursery", "higher", "internet", "romantic", "famrel", "freetime", "goout", 
+                             "Dalc", "Walc", "health")) -> students 
+
+students %>% 
+  mutate("student" = paste0("id", row_number()), .before = "school")  %>% 
+  drop_na() %>% 
+  mutate(G_mat = rowMeans(dplyr::select(., c(G1_mat, G2_mat, G3_mat))),
+         G_por = rowMeans(dplyr::select(., c(G1_por, G2_por, G3_por)))) %>% 
+  mutate(ansences_mat_groups = ifelse(absences_mat <=5, "less", ifelse(absences_mat <=15, "middle", "more"))) %>% 
+  mutate(ansences_por_groups = ifelse(absences_por <=5, "less", ifelse(absences_por <=15, "middle", "more"))) -> students-> students
+```
+
+# Statistical inference
+
+We finished the introduction to statistics, discussed random variables and probability, and learned how to calculate descriptive statistics: measures of central tendency, where the center of mass of our data tends to be (mean, median, mode), and measures of variability, showing how much our data varies from observation to observation (variance, standard deviation, interquartile range). We needed descriptive statistics to describe our data, to replace a big, incomprehensible table of raw data with specific values, and to make some assumptions about whether there are differences between them if we are talking about a sample from the general population, or some conclusions if our data represents the entire general population.
+
+In addition to describing the data, we talked about sample estimates - parameters calculated on our sample in an attempt to estimate these parameters in the general population. As a rule, we are interested in parameters that define the distribution of a feature in a population. Recall that in psychological research, our features are most often random variables, and therefore, according to the central limit theorem, are normally distributed.
+
+**The ratings we received:**
+
+-   Point estimates: sample mean (M, $\overline X$ ) and sample standard deviation (s, sd)
+
+-   Interval estimates: confidence interval in which the population mean is found with a given probability: M ± CI. Most often, 95% or 99% confidence intervals are considered.
+
+Let us remember that population and sample estimates are written differently on purpose, so as not to get confused about whether we are talking about a sample or the general population:
+
+|                                    | **General population** | **Sample**       |
+|--------------------------------|----------------------|------------------|
+| Average (mathematical expectation) | $\mu$                  | M, $\overline X$ |
+| Standard deviation                 | $\sigma$               | s, sd            |
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="100%"}
+knitr::include_graphics("images/sample-inference.png")
+```
+
+Let's recall the calculation of the confidence interval:
+
+> A study of married couples in Russia (the sample size was 100 married couples) with teenage children showed that couples where the father and mother work full time spend an average of 15 hours of free time per week with their children. According to the data of the study, the standard deviation was 4.5 (h). Can we say at a confidence level of 0.99 that in families where both the father and mother work, parents spend an average of more than 14 hours per week with their teenage children?
+
+<div>
+
+<details>
+
+<summary>*Solutiion*</summary>
+
+1.  Сначала определеяем, о чем нас спрашивают в этой задаче: нам нужно посотроить доверительный интервал для выборочного среднего = 15 и сравнить его с числом 14: находится оно левее этого интервала, и тогда можно сказать, что родители проводят с детьми в среднем больше 14 часов, или 14 входит в этот интервал, и тогда это утверждение будет неверно
+
+2.  Вычисляем доверительный интервал CI (confidence interval): равен $Z_{99\%} \times se$: Z-значение, при котором охватывается 99% даннных, равно примерно 3. $se = \frac{\sigma}{\sqrt{n}} = \frac{sd}{\sqrt{n}} = \frac{4.5}{\sqrt{100}} = 0.45$ Доверительный интервал равен $Z_{99\%} \times se = 3 \times 0.45 = 1.35$:
+
+3.  Таким образом, можем записать доверительный интервал: $[M-CI; M+CI] = [15-1.35; 15+1.35] = [13.65;16.35]$. Сравним его с числом 14: видимо, что 14 входит в этот интервал, то есть, утверждение, что родители проводят с детьми в среднем больше 14 часов на уровне доверия 0.99 неверно.
+
+</details>
+
+</div>
+
+## The idea of ​​statistical inference
+
+How to make the right conclusion and not screw up?
+
+-   Formulate a meaningful testable hypothesis
+
+-   Select a representative sample
+
+-   Collect quality (good) data on it
+
+-   Process the data according to the quality processing algorithm
+
+*Garbage in, garbage out (GIGO).*
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="100%"}
+knitr::include_graphics("images/garbage.jpg")
+```
+
+We find it within the framework of frequentist (frequency) statistics - that is, we talk about frequencies and probabilities. We could say little based on the sample estimates of one study: let's say we studied 100 married couples and calculated that the average time that parents spend with their children in Russia is 15 hours, but how can we understand whether the average in the general population is also 15, and not, for example, the same 14?
+
+The idea of ​​statistical hypothesis testing (null hypothesis statistical testing) is based on the fact that we make some assumption about the general population and its parameters: the mean (mathematical expectation), standard deviation or some other parameters, and statistically test this assumption. If we select many samples and calculate their averages, what is the probability of obtaining such or more different from the population sample estimates purely by chance, if in fact this is not the case?
+
+Let's return to our example about time spent with children, let's recall the dataset about Portuguese students
+
+```{r eval=TRUE, echo = FALSE, message = FALSE}
+kable(students[1:10,]) %>% scroll_box(width = "100%") 
+```
+
+Let's ask three questions:
+
+> Let's say we studied families with teenagers in large (GP school) and small cities (MS school) and calculated on our sample that in large cities parents spend an average of 14 hours a week with their children, and in small cities - 15 hours (from the data of the confidence interval task). 1. Is there a statistically significant difference in the time that parents spend with their children in Russia in large and small cities? 2. Is there a statistically significant difference in the frequency of alcohol consumption in families with less supportive relationships and more supportive ones? 3. Is there a statistically significant difference in the average score in mathematics for those who skip classes more or less often?
+
+We saw the question of statistical significance. **Statistical significance** is the probability level that our values ​​found in *the sample* must exceed in order for us to draw a conclusion about *the general population* . Why can't we just say that 14 and 15 are obviously different numbers, which means that the values ​​are different? Because we measured these values ​​only in one sample, and the conclusions we draw are based on the probabilities of obtaining these or those values ​​or the frequencies of their occurrence (frequentist statistics!). And we know that if we repeat the study many, many times, the means in them will not be the same, according to the central limit theorem, they will be distributed normally, where the mean will be the mean of the general population (the mathematical expectation).
+
+In order to answer the question of whether there are statistically significant differences, it is necessary to test the hypothesis about the differences using the **NHST algorithm (null hypothesis statistical testing)**
+
+## 8.2 NHST: Hypothesis Testing and Data Analysis Algorithm
+
+1.  We formulate **an empirical hypothesis** (a hypothesis in the language of the possibilities of the study that will be conducted), identify **the dependent and independent variables** and the nature of the studied relationship between them. We understand what the collected data will look like.
+
+2.  We select the conditions under which we will calculate the statistical criterion – **the significance level** $\alpha$ (probability of a false positive finding, most often α=0.05) and **statistical power** $power = 1-\beta$ (the probability of detecting an effect, if there is one, is most often power=0.8).
+
+3.  We select **a statistical criterion** for testing the hypothesis (for example, t-test, Mann-Whitney test, ANOVA, Kruskal-Wallis test, correlation test, linear regression, etc.).
+
+4.  We formulate **the null hypothesis** $H_0$ (about the absence and differences or connections) and **an alternative hypothesis** $H_1$ (about the presence of differences or connections)
+
+5.  Based on α, power, and the effect size of previous studies for the selected statistical criterion, we calculate **the required sample size** .
+
+– *collecting data* –
+
+6.  We select the data analysis environment and pre-process the data.
+
+7.  **For the selected variables, we calculate descriptive statistics** separately ; the variables are visualized using a histogram or a barplot or a density plot.
+
+8.  We calculate **the statistical criterion** : we calculate the key statistics (t-value, F-value, R, etc.) and p-value, we calculate the effect size (Cohen's d, eta squared, etc.).
+
+9.  **We draw conclusions and interpret the statistics** obtained during the statistical test: we compare the obtained p-value with the selected level $\alpha$, if p-value \< $\alpha$ – we believe that we have enough evidence to reject the null hypothesis $H_0$, and we decide on the correctness of the alternative hypothesis $H_1$.
+
+10. We draw **a conclusion regarding the empirical hypothesis** .
+
+11. **We visualize the data** with a graph illustrating the results (scatterplot with trend line, boxplot, violet plot, etc.).
+
+Let's look at each step.
+
+## Empirical hypotheses and variables
+
+**Empirical hypotheses** are those that we can test empirically. To formulate them correctly, we also need to decide on the type of empirical research that is possible to test our theoretical hypotheses. In psychological research, this is most often **an experiment, a quasi-experiment, a correlational study (and a longitudinal study** as its subtype). Sometimes there is **a case study** , a study of one specific case, more often in cognitive psychology and neuroscience.
+
+Empirical hypotheses are formulated in a form that can be tested for our study, that is, translated into the language of the study, based on our assumed variables and their values.
+
+Let's look at some examples. What methods can be used to study these issues?
+
+Case 1
+
+> Suppose a group of scientists wants to study the effect of smoking on the development of mental disorders. What studies could be conducted to investigate this issue?
+
+Case 2
+
+> Let's assume that before the elections to the State Duma, a group of sociologists conducts a public opinion poll to identify preferences for candidates. To do this, call center operators called phone numbers selected randomly from the Moscow phone directory, according to the principle of "every tenth number." The calls continued for a week during the call center operators' working hours from 10 to 18. What methods are used in such research? What can be said about them, do they have any shortcomings?
+
+*Methods*
+
+And let's return to our situation with the data on Portuguese students.
+
+> Let's say we studied families with teenagers in large (GP school) and small cities (MS school) and calculated on our sample that in large cities parents spend an average of 14 hours a week with their children, and in small cities - 15 hours (from the data of the confidence interval task). 1. Is there a statistically significant difference in the time that parents spend with their children in Russia in large and small cities? 2. Is there a statistically significant difference in the frequency of alcohol consumption in families with less supportive relationships and more supportive ones? 3. Is there a statistically significant difference in the average score in mathematics for those who skip classes more or less often?
+
+The method used here is a correlational study. If there were any other manipulations in this study with different schools, it would be a quasi-experiment (since we can’t take identical families and tell some of them “spend 15 hours with the kids” and others “spend 14 hours with the kids”, we already have these groups, we don’t do the manipulations ourselves).
+
+Empirical hypothesis 1 might sound like this:`families in cities spend less time comparatively with families in rural areas`
+
+Empirical hypothesis 2:`studens evaluatiin their relationship with parents as less supportive (variable famrel, less supportive coded as 1-2), drink more alcohol (variable Walc, values 4-5)`
+
+Empirical hypothesis 3`Studens with more absences will have less grade (avarage amoung G1_mat, G2_mat, G3_mat или G1_por, G2_por, G3_por -- small values)`
+
+Let's first think about what these hypotheses are, what dependent and independent variables, the presence or absence of what relationship between the dependent and independent variables we want to test?
+
+### Dependent and independent variables
+
+**Independent variables** are everything we manipulate during the course of the study, what differences we create in order to obtain a different result. **The dependent variable** is the target variable, the differences in which we want to obtain by manipulating the independent variables, what we measure. When describing a study, it is always important to write down the PP and NP, along with the empirical (if the method is an experiment, then the experimental) hypothesis. The empirical hypothesis and variables are the heart of our study, the most basic of the language in which the study is described, without understanding what we want to test, nothing will work.
+
+When describing salary and wages, is it important to indicate what scale they belong to? It is important to understand this in order to later choose how to analyze the data.
+
+For hypothesis 1
+
+We assume that the average time parents spend with their children per week is correlated with school, meaning that the average time will vary across schools:
+
+<p align="center">
+
+$Time \sim School$
+
+</p>
+
+-   DV – average time spent by parents with children per week, quantitative continuous – relationship scale
+
+-   IV – school location (urban / rural) – categorical nominative
+
+For hypothesis 2
+
+<p align="center">
+
+$Walc \sim famrel$
+
+</p>
+
+-   DV – Walc, the amount of alcohol consumed by students on weekends, expressed by a questionnaire with a scale from 1 to 5. DV is an ordinal scale.
+
+-   IV – famrel, an assessment of how supportive the relationships in the family are, expressed by a questionnaire with a scale from 1 to 5. IV – ordinal scale.
+
+For hypothesis 3
+
+<p align="center">
+
+$?? \sim ??$
+
+</p>
+
+-   DV – ?
+
+-   IP – ?
+
+### Levels in categorical variables
+
+Levels in an independent variable (IV) are spoken of in categorical – ordinal or nominative – variables. This is a list of possible values ​​that a categorical IV can take. For example, the conditions “often” and “rarely”, the conditions “well-off family” or “poorly-off”. In the examples above, for the hypothesis, `families in cities spend less time comparatively with families in rural areas` we are going to compare two groups, and here we can speak of IV levels `город`– `urban`and \`rural\`\`.
+
+Depending on what conclusions we want to draw, we may need a different number of levels in the data. Compare hypotheses: `studens evaluatiin their relationship with parents as less supportive (variable famrel, less supportive coded as 1-2), drink more alcohol (variable Walc, values 4-5)` and `Less assesment of support ( famrel), more alcohol consumption (Walc)`. How are they different?
+
+*Differences*
+
+The statistical method we choose will depend on what conclusion we want to make, whether we want to discover the nature of the relationship between the levels of a categorical variable (usually linear, but it can also be something else, exponential, for example) or whether it is enough for us to compare two groups with each other. We will return to this a little later.
+
+### Relationship between variables
+
+What kind of connection can we conclude?
+
+There are two main types of relationships between variables:
+
+-   **Associative or correlational**
+
+-   **Cause and effect**
+
+Three necessary conditions for establishing **a cause-and-effect relationship** :
+
+1.  The change in IV occurred before we observed a change in the DV
+
+2.  Changes in the IV have an associative connection with changes in the DV
+
+3.  There are no alternative explanations for the changes in the DV, other than the changes in the IV
+
+At the moment, we only have survey data, in which students answered questions simultaneously. It turns out that in such a research design, we do not go through the necessary conditions for establishing a cause-and-effect relationship, therefore, we cannot draw a conclusion about a cause-and-effect relationship. We can establish a cause-and-effect relationship only in the course of **an experiment** or **quasi-experiment** (it differs from an experiment in that the subjects are not randomly distributed into groups, but groups that already exist in the population are used, for example, different countries). In all other types of research, especially when the relationship of variables in one self-report or questionnaire is studied, we can only talk about an associative or correlational relationship.
+
+It often happens that it is quite possible that bad relationships in the family lead to alcoholism in children. But in our sample we only have such data - from the questionnaire, and from the data of that study that we have, we can only judge the presence or absence of a correlation.
+
+When formulating conclusions, these conclusions may differ as follows, compare: - Conclusion 1: “Less supportive family relationships cause alcoholism.” - Conclusion 2: “Less supportive family relationships are associated with a high risk of alcoholism.”
+
+In order to test whether there are statistically significant differences between these groups, it is necessary to formulate a null and alternative hypotheses.
+
+## Null and Alternative Statistical Hypotheses
+
+In order to conduct a statistical test, it is necessary to define **statistical hypotheses** - artificially introduced testable statements regarding the general population. They are introduced precisely in order to be able to somehow calculate the data and statistically draw a conclusion based on them about the general population for our small sample. There are two statistical hypotheses, they are mutually opposite: the null (main) and alternative hypotheses.
+
+**Null (main) hypothesis** $H_0$ – this is always a hypothesis about the absence of differences in the general population. The hypothesis about the absence of differences between groups (if the hypothesis implies a comparison of groups) or about the absence of a relationship between variables (if the hypothesis is about the relationship of quantitative continuous variables). We try to refute it in statistical testing (yes, exactly refute, not confirm – the conclusions that we can make regarding the null hypothesis are only to reject or not to reject, we cannot confirm it and accept it).
+
+**Alternative hypothesis** $H_1$- a hypothesis opposite toH0H0, that is, the hypothesis about the presence of differences in the general population. $P(H_0) + P(H_1) = 1$
+
+What about $H_0$ и $H_1$ for our hypotheses?
+
+For hypothesis 1
+
+<p align="center">
+
+$Time \sim School$
+
+</p>
+
+For hypothesis 2
+
+<p align="center">
+
+$Walc \sim famrel$
+
+</p>
+
+-   DV – Walc, the amount of alcohol consumed by students on weekends, expressed by a questionnaire with a scale from 1 to 5. DV is an ordinal scale.
+
+-   IV – famrel, an assessment of how supportive the relationships in the family are, expressed by a questionnaire with a scale from 1 to 5. IV – ordinal scale.
+
+For hypothesis 3
+
+<p align="center">
+
+$?? \sim ??$
+
+</p>
+
+-   DV – ?
+
+-   IV – ?
+
+### Directional and non-directional hypotheses
+
+At this stage, it is important for us how the empirical hypothesis is formulated: towards an increase/decrease in the value of the salary in one of the groups or, in general, that the values ​​of the salary in the groups differ in a non-directional manner?
+
+## Significance level and statistical power
+
+Once we have sorted out the hypotheses, empirical and statistical, we need to set the criteria on the basis of which we will make decisions about the conclusions we draw from our sample to the general population.
+
+Level of significance $\alpha$ and statistical $power = 1-\beta$ – these are two of the most important parameters in hypothesis testing. These concepts set the probability framework in which we will conduct the test. The first framework is the probability of obtaining a significant result (significant differences between groups or a relationship between variables) if it is not actually in the general population – a false positive, aka a type I error $\alpha$.
+
+<p align="center">
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="70%"}
+knitr::include_graphics("images/errors_types.jpg")
+```
+
+</p>
+
+The second frame is the probability of obtaining an insignificant result, if it actually exists in the general population - a false negative result, also known as a type II error $\beta$.
+
+<p align="center">
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="80%"}
+knitr::include_graphics("images/errors.jpg")
+```
+
+</p>
+
+**Level of significance** $\alpha$, it is also a type I error - to make a false positive conclusion, that is, when there is no effect in the general population, but we conclude that it is there - we set it ourselves (!). In psychology, there is a conventional agreement to consider the level of significance $\alpha = 0.05$ That is, we simply agreed to consider the 5% probability of making a false positive conclusion as a compromise between being able to make any conclusions at all about the general population, and the fact that 5% of our studies will contain incorrect conclusions (in fact, much more, we will talk about this later).
+
+But this is an agreement, and a controversial one at that! In elementary particle physics $\alpha = 0.000003$!
+
+Article “Justify your alpha” in Nature Human Behaviour <https://www.nature.com/articles/s41562-018-0311-x>
+
+The probability that in the population there actually is a difference between groups or a relationship, but we were unable to detect it in our data $\beta$, it is also a type II error - this is a type II error, the probability of making a false negative conclusion. And if a type I error $\alpha$ explicitly appears in hypothesis testing - this is the value with which we compare our resulting p-value, then $\beta$ does not participate in this testing. That is, we can easily get a false negative conclusion, the absence of results, although in fact they are. Therefore, we need to enter $\beta$ in testing the hypothesis and minimize such probability. For this purpose, the concept of statistical power of the test was introduced $power = 1 - \beta$.
+
+**The level of statistical power** is a positive metric, the level of probability at which we are guaranteed that if differences between groups or a relationship between variables exist in the general population, we will be able to find it in our data using our statistical test. If you look at a table of type I and type II errors, statistical power is the inverse of the probability of a type II error, not finding a significant effect if it exists. In psychology, it has become conventional that statistical power is most often taken at the level $power = 1 - \beta$. Another agreement!
+
+## Selection of statistical criterion
+
+How do you know which test to choose? This is probably one of the most difficult questions in statistics. It is influenced by a large number of nuances, which we will consider in the next section
+
+## Sample size and effect size
+
+**Calculating the sample size** is a critical step because it is responsible for leveling out the type II error and making a false negative conclusion. It may well turn out that due to the small sample, we simply were unable to record differences that actually exist in the general population!
+
+This point was often overlooked before: it seemed that the sample size did not require a specific calculation, and it was enough to rely on previous research. It turned out that this is not the case, we will talk about the consequences of this approach in more detail below.
+
+To calculate the required sample, we need to know the approximate size of the effect that we can detect, the level of significance $\alpha$, and statistical power $power = 1 - \beta$.
+
+**The effect size** is the magnitude of the observed differences. *The degree of difference is determined not by the statistics obtained after the statistical criterion is applied (e.g., t-value, F-value), and not by the p-value, but by a separate metric* . This metric is calculated using formulas individually for each statistical test. For example, for a t-test, the effect size is $Cohen's \ d$ or its normalized version $Hedges`\  g$ (used less frequently in practice). The only exception is the correlation coefficient $r$ – it will be both a statistic and an effect size. For a linear regression with one predictor (factor, also an independent variable), the effect size can also be $R^2$, and for multiple, when there are many predictors (factors or NP), it is better to use the metric $Cohen’s \ f^2$ or $partial \ \eta^2 2$. In psychological research, unless it involves psychophysiology, the effect size is rarely large - usually in the small to medium range. And the smaller the expected effect size, the more observations we need to collect to be able to draw an accurate conclusion about the presence or absence of differences in the general population!
+
+*There is a good visualization of the effect size for Cohen's* d t-test <https://rpsychologist.com/d3/cohend/>
+
+Effect size is typically involved in hypothesis testing at two stages [of this algorithm](https://elenary.github.io/StatsForDA/inference.html#nhst) :
+
+1.  To calculate the sample size at the planning stage of the study - in this case, the effect size from similar studies already conducted is used in order to roughly estimate the possibility of catching the population effect in our sample and collecting the required number (step 5 of this algorithm).
+
+2.  When interpreting a statistical test performed on data. The effect size is one of the key numbers for understanding the results of statistical tests (step 10 of this algorithm)
+
+If the articles you rely on when planning your study do not indicate the effect size, you can calculate it yourself based on the data provided in the articles: the sample size in the study, the adopted level of statistical power (if not specified, then it is usually taken as 0.8) and the selected level of statistical significance $\alpha$ (if not specified, then it is usually taken as 0.5).
+
+Table with effect size metrics and interpretation of their magnitudes on the Cambridge University website and <https://imaging.mrc-cbu.cam.ac.uk/statswiki/FAQ/effectSize>
+
+| **Stat criterion** | **Effect size metric** | **Small effect** | **Average effect** | **Strong effect** |
+|---------------|---------------|---------------|---------------|---------------|
+| t-test | Cohen′s d,Hedges′ gCohen′s d,Hedges′ g | 0.2 | 0.5 | 0.8 |
+| ANOVA | η2,ω2η2,ω2 | 0.01 | 0.06 | 0.14 |
+| ANOVA | Cohen′ fCohen′ f | 0.1 | 0.25 | 0.4 |
+| linear regression (one factor) | Cohen′ fCohen′ f | 0.1 | 0.25 | 0.4 |
+| linear regression (multiple factors) | partial η2partial η2 | 0.02 | 0.13 | 0.26 |
+| linear regression (multiple factors) | Cohen′ fCohen′ f | 0.14 | 0.39 | 0.59 |
+| correlation test | rxyrxy | 0.1 | 0.3 | 0.7 |
+
+“Calculating and reporting effect sizes to facilitate cumulative science: a practical primer for t-tests and ANOVAs” <https://www.frontiersin.org/articles/10.3389/fpsyg.2013.00863/full>
+
+**Effect size, significance level** $\alpha$, statistical power and sample size are related parameters. Knowing 3 of them, you can always calculate the fourth! <https://rpsychologist.com/d3/nhst/>
+
+This can be done in G\*Power <https://www.psychologie.hhu.de/arbeitsgruppen/allgemeine-psychologie-und-arbeitspsychologie/gpower> or in R, for example, using the package `pwr` <https://cran.r-project.org/web/packages/pwr/pwr.pdf> .
+
+Let's say we decided to test the hypothesis that students whose parents received a master's degree do better than those whose parents graduated from college. We chose the level of statistical significance $\alpha = 0.05$, with which we will compare the p-values ​​that we obtain. We chose the level of statistical $power = 0.8$ (that is, a type II error $\beta = 0.2$). We chose to test this hypothesis using a t-test. From a previous similar study, we learned that the effect size in a similar study was Cohen's d = 0.37. And now we can estimate how much data we need to collect so that if there was a difference between such students in the general population, we could detect it in our data. These 4 values ​​are mathematically related, so knowing any 3, we can calculate the fourth.
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="80%"}
+knitr::include_graphics("images/power_samplesize.jpg")
+```
+
+Underpowered studies are a huge problem for many sciences. “Power failure: why small sample size undermines the reliability of neuroscience” <https://www.nature.com/articles/nrn3475>
+
+```{r}
+library(pwr)
+pwr::pwr.t.test(d=0.37,power=0.8,sig.level=0.05,type="two.sample", alternative="greater")
+```
+
+Similarly, calculating the sample size to test the hypothesis that parental education and preparatory course completion are somehow related to student achievement was done by fitting a linear model.
+
+```{r, message=FALSE}
+library(WebPower)
+WebPower::wp.regression(n = NULL, p1 = 2, f2 = 0.24, alpha = 0.05, power = 0.8)
+```
+
+The package has a web application <https://webpower.psychstat.org/models/reg01/>
+
+An important point about statistical power: it is precisely this that shows how often the errors will occur $p$-values \< $\alpha$ if the alternative hypothesis is true (that there are differences or a connection!)
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="100%"}
+knitr::include_graphics("images/pvalue_dist_2.png")
+```
+
+To get a detailed understanding of the nuances of effect size and sampling, you can take Lakens' course <https://www.coursera.org/learn/statistical-inferences> (it seems that now only with a VPN)
+
+## Calculation of the static criterion and significance testing
+
+Let's return to our questions again.
+
+> Let's say we studied families with teenagers in large (GP school) and small cities (MS school) and calculated on our sample that in large cities parents spend an average of 14 hours a week with their children, and in small cities - 15 hours (from the data of the confidence interval task). 1. Is there a statistically significant difference in the time that parents spend with their children in large and small cities? 2. Is there a statistically significant difference in the frequency of alcohol consumption in families with less supportive relationships and more supportive ones? 3. Is there a statistically significant difference in the average score in mathematics for those who skip classes more or less often?
+
+Using the first question as an example, we will analyze the process of testing the null hypothesis, how *any* statistical criterion works.
+
+$\mu$ = 14, M = 15, n = 100, sd = 4.5
+
+Let us formulate the null and alternative hypotheses. The null hypothesis is always a hypothesis of no differences, i.e. that the average time parents spend with their children per week does not differ in large and small cities.
+
+<p align="center"> $H_0$: $\mu_{urban} = \mu_{rural}$ </p>
+<p align="center"> $H_1$: $\mu_{urban} \neq \mu_{rural}$ </p>
+
+Another important point is to choose the significance level, the boundary value, upon crossing which we will make a decision that we can reject the null hypothesis. Usually$\alpha = 0.05$
+
+Next we begin to test our null assumption, we will try to disprove the null hypothesis.
+
+So, we assume that the null hypothesis is true. Further, if we assume that it is true, then $\mu_{urban}$ и $\mu_{rural}$ will be at one point. Since we are talking about two averages of different samples, we need a distribution of sample averages on which we can place $\mu_{urban}$ and $\mu_{rural}$.
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="80%"}
+knitr::include_graphics("images/means_dist.png")
+```
+Next, we need to somehow estimate how much $\mu_{urban}$ far from from $\mu_{rural}$. What do we always do when we need to compare which of the values ​​taken from different samples is greater or less than the other? We switch to the standard normal distribution - the Z-score distribution! 
+$Z = \frac{X - \bar X}{sd}$
+
+Moreover, the standard deviation of this distribution will be the standard error of the mean– the value of the standard deviation for the distribution of sample means.
+
+Let's take as the middle of the distribution $\mu_{urban}$ (arbitrary, we can take any of the averages). To translate $\mu_{rural}$ in Z-score, first we calculate the standard error of the mean $\mathrm{se} = \frac{\sigma}{\sqrt{n}} = \frac{sd}{\sqrt{n}}$.
+$se = \frac{4.5}{\sqrt{10}} = 0.45$ *(we have already calculated it to calculate the confidence interval - the mathematics of these processes are almost identical!)*
+
+$Z_{Mrural} = \frac{\mu_{rural} - \mu_{urban}}{se}$.
+
+$Z_{Mrural} = \frac{15-14}{0.45} = 2.2$
+
+Now we can arrange $\mu_{rural}$ on the Z-distribution with the mean at $\mu_{urban}$ and see how far apart they are.
+
+```{r eval=TRUE, echo = FALSE, message = FALSE, fig.align = 'center', out.width="80%"}
+knitr::include_graphics("images/z_dist.png")
+```
+
+We know that the number 2 in the Z-score distribution corresponds to approximately 96% of the data (we know the data distribution for any normal distribution). And remember that we constructed this distribution based on the assumption that the null hypothesis is equal, that $\mu_{urban} = \mu_{rural}$ How then can we interpret the obtained estimates?
+
+It turned out that the probability of getting the value $\mu_{rural} = 15$ or even further from $\mu_{urban}= 14$  if the assumption is true that $\mu_{urban} = \mu_{rural}$ составляет $P(M_{rural} | \mu_{urban} = \mu_{rural}) = 1 - 0.96 = 0.04$.**This is our p-value** , the target statistic we are trying to obtain.
+
+**P-value is the probability (area of ​​the graph under the curve) of obtaining such and even more radical differences (going into the tails) under the condition that the null hypothesis is true (that in fact there are no differences in the general population, and we obtain this result by chance).**
+
+There is a lot of confusion in the interpretation of p-value, to unravel the confusion you can read these articles:
+
+-   Article “A Dirty Dozen: Twelve P-Value Misconceptions” <https://sixsigmadsi.com/wp-content/uploads/2020/10/A-Dirty-Dozen-Twelve-P-Value-Misconceptions.pdf>
+
+-   Misuse of p-values ​​- Misuse of *p-* values ​​- [https://ru.abcdef.wiki/wiki/Misuse_of_p-values ​​https://ru.abcdef.wiki/wiki/Misuse_of_p-values](https://ru.abcdef.wiki/wiki/Misuse_of_p-values)
+
+Next, after we have obtained the p-value, we compare this value with our chosen level $\alpha$– the probability that we can accept of making a false positive conclusion, of making a type I error.
+
+-   If $p \ value < \alpha$:
+
+    -   the location of our means looks atypical for the null hypothesis - we assumed the means would be at one point, but they moved apart quite a bit
+
+    -   we believe that **the probability of obtaining such or even stronger differences between the means, given the validity of the null hypothesis, is statistically significantly small**
+
+    -   **therefore we can reject the null hypothesis of no difference**
+
+    -   **we accept the alternative hypothesis that there are differences**
+
+-   If $p \ value \ge \alpha$:
+
+    -   the location of our means looks typical for the null hypothesis - the means are not spread out enough, so our data looks like the null hypothesis is true
+
+    -   **we cannot reject the null hypothesis**
+
+The p-value is related, we have already discussed this above in sample size diiscussioin:
+
+-   Sample size: the larger the sample size, the greater the statistical power and the more often and confidently p-values < 0.05 will appear
+
+-   Variance: the smaller the variance and the more homogeneous the data, the lower the p-value will be
+
+In our case: $p-value = 0.04 < \alpha = 0.05$.
+
+In this case, since the p-value is less than alpha, we can say that the probability of obtaining such or even stronger differences between the means is sufficiently small, provided that the null hypothesis is true, so we can reject the null hypothesis of no differences and accept the alternative hypothesis that there are differences between the means. That is, we have tested the statistical hypothesis and concluded that in the general population $\mu_{urban}$ и $\mu_{rural}$  are different!
+
+What did we do just now?
+
+-   We put forward a null hypothesis about the absence of differences between the groups, which we will reject - that is, that the means of the two groups are at the same point
+
+-   Formulated an opposite alternative hypothesis
+
+-   We have stated that we will test the null hypothesis at the significance level $\alpha = 0.05$
+
+-   Placed the first mean on the distribution of sample means in the middle and agreed to estimate the actual (in the data) location of the second mean from it
+
+-   To estimate how far the second mean was from the first in our data, we converted everything into Z-scores and calculated the Z-score for the second mean.
+
+-   Based on the calculated Z-score, we placed the second mean on the distribution of sample means and calculated what percentage of the data lies beyond this value (p-value)
+
+-   Comparedp-value $p-value$ with $\alpha$: it turned out to be less than 0.05, so we rejected the null hypothesis of no differences and concluded that the means in the general population differ.
