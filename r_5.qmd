@@ -1,0 +1,933 @@
+---
+format:
+  html:
+    theme: cosmo
+    self-contained: true
+---
+
+## Testing Hypothesis 2: ANOVA and Linear Regression
+
+```{r eval=TRUE, echo = FALSE, message = FALSE}
+library(tidyverse)
+library(kableExtra)
+```
+
+### ANOVA (analysis of variance)
+
+I wanted to add some variety to our data, so I found another [table](https://elenary.github.io/StatsForDA/R_analysis.html#https://github.com/elenary/StatsForDA/blob/main/Chapter2OnlineData2019.xls?raw=true) related to the World Happiness Report, you can read more about it [here](https://elenary.github.io/StatsForDA/R_analysis.html#https://s3.amazonaws.com/happiness-report/2019/WHR19_Ch2A_Appendix1.pdf) (by the way, this doc, apparently, is also formatted in R).
+
+This is roughly what preprocessing of real (not the cleanest and crooked) data might look like: I combine two tables (the table for 2016 and the new table for 2019) using the function `right_join`(this means that I attach the left table to the right one, and everything that is left in the left one that does not fit into the right one is not taken) from the family `join`, rename columns and replace spaces on them with underscores using the function `rename_with`, select only the columns that interest me using the function `select`, create new variables that we have already created earlier in homework, using the mutate function and save the result in a new table in the dataset`whr_tests_hw`
+
+```{r eval=TRUE, echo = TRUE, message = FALSE}
+
+whr_2019 <- readxl::read_xls("Chapter2OnlineData2019.xls")
+whr <- read_csv("2016.csv")
+
+whr_2019 %>%
+  rename_with(~ gsub(" ", "_", .), .cols = everything()) %>% 
+  select(Country_name:Negative_affect) %>%
+  filter(Year <= 2016) -> whr_2019
+
+whr %>%
+  rename_with(~ gsub(" ", "_", .), .cols = everything()) %>% 
+  select(Country, Happiness_Rank, Happiness_Score) %>%
+  right_join(whr_2019, by = join_by(Country == Country_name), multiple = "last") -> tmp
+
+whr %>%
+  select(Country:Region) %>%
+  right_join(tmp, by = join_by(Country == Country), multiple = "all") %>%
+  mutate("top20" = ifelse(Happiness_Rank<=20, "hehe", "not hehe"),
+         "mean_position" = ifelse(Happiness_Score>= mean(Happiness_Score, na.rm = TRUE), "upper", "lower")) -> whr_tests_hw
+```
+
+I also downloaded the result of this preprocessing into a separate file using `R`the function <https://raw.githubusercontent.com/elenary/StatsForDA/main/whr_tests_hw.csv>`write_csv()`
+
+Previously, we tested the hypothesis that the Happiness Score differs in two regions: Western and Eastern and Central Europe. But what if I want to check whether the level of happiness differs statistically significantly in three regions - Western and Eastern and Central Europe and in Latin America? Again, we turn to [the statistical criteria](https://elenary.github.io/StatsForDA/stats_criteria.html#stats_criteria) we studied last semester , remember the picture with the tree of choosing statistical tests <https://miro.com/app/board/uXjVOxmKhr8=/> . If we have a quantitative PP, categorical NP / categorical, and we need to conduct 3 or more comparisons - then we move from the t-test to [ANOVA (analysis of variance)](https://elenary.github.io/StatsForDA/stats_criteria_ttest_anova.html#anova) .
+
+I will periodically adhere to the form of writing code when I do everything at once inside one pipe - both filtering and plotting graphs or calculating a test, but do not forget that before writing everything together, you need to make sure that each line works. And it may be more convenient at first to create more variables and write the filtering results there, and then use this variable - this will make it easier to debug the code. For example, you can first filter the data and write it to a new dataset (sometimes it happens that you cannot do without this form of writing)
+
+```         
+whr_tests_hw %>%
+  filter(Region == "Central and Eastern Europe" | Region == "Western Europe" | Region == "Latin America and Caribbean") %>%
+  filter(Year == "2016") -> whr_anova
+```
+
+Recalling the assumptions for [ANOVA](https://elenary.github.io/StatsForDA/stats_criteria_ttest_anova.html#anova)
+
+First, wages should be distributed close to a normal distribution.
+
+```         
+whr_anova %>%
+  ggplot(aes(x = Happiness_Score)) +
+  geom_density(color = "#355C7D") +
+  theme_minimal()
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-65-1.png)
+
+```         
+whr_anova %>%
+  ggplot(aes(sample = Happiness_Score)) +
+  stat_qq(color = "#355C7D") +
+  geom_qq_line() +
+  theme_minimal()
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-65-2.png)
+
+Let's say it looks like a normal distribution.
+
+The second assumption is homogeneity (homoscedasticity) of variances. Variances should be the same in our groups. If they are different, this is bad, and we will have to use nonparametric analogs of ANOVA. Homogeneity of variances is checked using Levene's Test. Note: here we are interested in obtaining a NON-significant result - because if the test yielded a significant result, then the variances in the groups are different, and this is not ok. We will need a function `leveneTest`from the package`car`
+
+```         
+options(scipen = 999) # 
+
+# install.packages("car")
+library(car)
+leveneTest(Happiness_Score ~ Region, data = whr_anova)
+```
+
+```         
+## Warning in leveneTest.default(y = y, group = group, ...): group coerced to
+## factor.
+```
+
+```         
+## Levene's Test for Homogeneity of Variance (center = median)
+##       Df F value Pr(>F)
+## group  2  0.7143 0.4933
+##       66
+```
+
+Look at the p-value: it's not significant, hooray! So we've met all the assumptions, and we can safely use anova. We'll try to build it in two ways: using a standard function `aov`and using a function `ezANOVA`from a package `ez`with a clearer syntax, but more picky and less stable.
+
+```         
+aov_model1 <- aov(Happiness_Score ~ Region, data = whr_anova) #выполняем АНОВУ
+summary(aov_model1) #выводим табличку АНОВЫ
+```
+
+```         
+##             Df Sum Sq Mean Sq F value       Pr(>F)    
+## Region       2  21.40  10.698   21.37 0.0000000697 ***
+## Residuals   66  33.04   0.501                         
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+How to interpret these results? The first thing we look at is the p-value (column Pr(F)). If it is less than the set levelaa, then we say that *we reject the null hypothesis and we have obtained statistically significant differences* . If the p-value is greater than or equal toaa– *we do not have enough evidence to support the alternative hypothesis, and we say that we do not reject the null hypothesis* .
+
+The second option for constructing the same analysis using the function `ezANOVA.`She, by the way, immediately does Levene's test, so we have two outputs.
+
+```         
+# install.packages("ez")
+library(ez)
+
+whr_anova %>% 
+  ezANOVA(., Happiness_Score, wid = Country, between = Region)
+```
+
+```         
+## Warning: Converting "Country" to factor for ANOVA.
+```
+
+```         
+## Warning: Converting "Region" to factor for ANOVA.
+```
+
+```         
+## Warning: Data is unbalanced (unequal N per group). Make sure you specified a
+## well-considered value for the type argument to ezANOVA().
+```
+
+```         
+## $ANOVA
+##   Effect DFn DFd        F              p p<.05       ges
+## 1 Region   2  66 21.37266 0.000000069727     * 0.3930773
+## 
+## $`Levene's Test for Homogeneity of Variance`
+##   DFn DFd       SSn      SSd         F         p p<.05
+## 1   2  66 0.3066018 14.16483 0.7142945 0.4932823
+```
+
+If we compare the results, they will be exactly the same, only the second function in the ges column also gives the effect size! This is eta squaredor2or2, [the effect size metric for ANOVA](https://elenary.github.io/StatsForDA/inference.html#sample_size) , which you used anyway in your homework last year. We can see that the effect we got is quite large!
+
+We can calculate it separately for the previous table using the package function effectsize
+
+```         
+# install.packages("effectsize")
+library(effectsize)
+
+eta_squared(aov_model1)
+```
+
+```         
+## # Effect Size for ANOVA
+## 
+## Parameter | Eta2 |       95% CI
+## -------------------------------
+## Region    | 0.39 | [0.24, 1.00]
+## 
+## - One-sided CIs: upper bound fixed at [1.00].
+```
+
+The value will be the same as in the ges column of the ezANOVA output.
+
+Visualize the results. The most common methods for visualizing ANOVA are boxplots or violet plots.
+
+```         
+whr_anova %>%
+  ggplot(aes(x=Region, y = Happiness_Score, fill = Region)) +
+  geom_boxplot() +
+  theme_minimal() +
+  scale_fill_manual(values = wes_palette("FantasticFox1"))
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-70-1.png) Or you can often find graphs that only show averages
+
+```         
+whr_anova %>%
+  ggplot(aes(x=Region, y = Happiness_Score, color = Region, group = 1)) +
+  stat_summary(fun = mean, geom = 'point') +
+  stat_summary(fun = mean, geom = 'line') +
+  stat_summary(fun.data = mean_cl_boot, geom = 'errorbar') +
+  theme_minimal() +
+  scale_color_manual(values = wes_palette("FantasticFox1"))
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-71-1.png)
+
+We know that the ANOVA is significant, that is, there are statistically significant differences between the three regions. But how do we know which regions are contributing to the significance? Could it be that the significance is being provided by one region that is very different from the others, while the other two are not different? It is. To find out, we need to conduct [post-hoc tests](https://elenary.github.io/StatsForDA/R_analysis.html#id_%D0%BF%D0%BE%D1%81%D1%82-%D1%85%D0%BE%D0%BA%D0%B8-%D0%B8-%D0%BC%D0%BD%D0%BE%D0%B6%D0%B5%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5-%D1%81%D1%80%D0%B0%D0%B2%D0%BD%D0%B5%D0%BD%D0%B8%D1%8F) .
+
+#### 14.13.1.1 Post-hoc analysis
+
+Post hocs are pairwise multiple comparisons of everything with everything. Remember that when we do this, we risk getting a statistically significant result purely by chance, because the probability of a type I error increases greatly, and corrections for multiple comparisons are needed. You can do post hoc analysis, for example, using built-in functions `TukeyHSD`or`pairwise.t.test`
+
+```         
+TukeyHSD(aov_model1, conf.level=.95)
+```
+
+```         
+##   Tukey multiple comparisons of means
+##     95% family-wise confidence level
+## 
+## Fit: aov(formula = Happiness_Score ~ Region, data = whr_anova)
+## 
+## $Region
+##                                                             diff        lwr
+## Latin America and Caribbean-Central and Eastern Europe 0.7082577 0.20757381
+## Western Europe-Central and Eastern Europe              1.3149770 0.82891110
+## Western Europe-Latin America and Caribbean             0.6067193 0.06961039
+##                                                             upr     p adj
+## Latin America and Caribbean-Central and Eastern Europe 1.208942 0.0033334
+## Western Europe-Central and Eastern Europe              1.801043 0.0000000
+## Western Europe-Latin America and Caribbean             1.143828 0.0230915
+```
+
+```         
+pairwise.t.test(whr_anova$Happiness_Score, whr_anova$Region, p.adj = "bonf")
+```
+
+```         
+## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  whr_anova$Happiness_Score and whr_anova$Region 
+## 
+##                             Central and Eastern Europe
+## Latin America and Caribbean 0.0035                    
+## Western Europe              0.000000039               
+##                             Latin America and Caribbean
+## Latin America and Caribbean -                          
+## Western Europe              0.0258                     
+## 
+## P value adjustment method: bonferroni
+```
+
+#### 14.13.1.2 Nonparametric Analogues of ANOVA
+
+If our variable has significant outliers, fails the normality test, and the variances in the groups are statistically significantly different, then we cannot use ANOVA. What to do? Conduct an analogue of ANOVA, the Kruskal-Wallis test. I will show it on the same data that we took for ANOVA, where we looked at different levels of happiness by region.
+
+```         
+kruskal.test(Happiness_Score ~ Region, data = whr_anova)
+```
+
+```         
+## 
+##  Kruskal-Wallis rank sum test
+## 
+## data:  Happiness_Score by Region
+## Kruskal-Wallis chi-squared = 26.36, df = 2, p-value = 0.000001888
+```
+
+#### 14.13.1.3 Multivariate ANOVA
+
+We tested the hypothesis with only one NP - region. But what if my hypothesis concerns several factors? For example, I want to test the hypothesis that the variable `Life_Ladder`(analogous to `Happiness Score`, shows the survey results, where respondents are by level of happiness in the form of a ladder with 10 steps) is affected by both region and year.
+
+I'll go back to the original dataset and remove the year filtering.
+
+It's all the same - let's check the assumptions first.
+
+```         
+whr_tests_hw %>%
+  filter(Region == "Central and Eastern Europe" | 
+           Region == "Western Europe" | 
+           Region == "Latin America and Caribbean") %>%
+  ggplot(aes(x = Life_Ladder)) +
+  geom_density(color = "#355C7D") +
+  theme_minimal()
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-74-1.png)
+
+```         
+whr_tests_hw %>%
+  filter(Region == "Central and Eastern Europe" | 
+           Region == "Western Europe" | 
+           Region == "Latin America and Caribbean") %>%
+  ggplot(aes(sample = Life_Ladder)) +
+  stat_qq(color = "#355C7D") +
+  geom_qq_line() +
+  theme_minimal()
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-74-2.png)
+
+```         
+whr_tests_hw %>%
+  filter(Region == "Central and Eastern Europe" | 
+           Region == "Western Europe" | 
+           Region == "Latin America and Caribbean") %>%
+  aov(Life_Ladder ~ Region + as.factor(Year), data = .) -> aov_model3
+#на всякий случай сделала as.factor(), он просто превращает число в строку. функции бывают не очень умными и думают, что нужнобрать числовую переменную 
+# как число, даже если задаем ее как группирующую переменную (фактор)
+summary(aov_model3)
+```
+
+```         
+##                  Df Sum Sq Mean Sq F value              Pr(>F)    
+## Region            2  273.0  136.51 271.048 <0.0000000000000002 ***
+## as.factor(Year)  11    6.8    0.62   1.229               0.263    
+## Residuals       681  343.0    0.50                                
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+The formula of the entry `dependent var ~ independen var 1 + independent var 2` means that I take into account two factors independently of each other. But sometimes I am interested in the interaction of factors: maybe in some regions nothing has changed much over the years, the level of happiness measured as `Life_Ladder`was constant, and in some regions there was a huge increase (or a huge negative increase) in the level of happiness? Then I will need to check the interaction of factors, and the formula will be: `dependent var ~ independen var 1 * independent var 2` Wherever I am interested in interaction, I put an asterisk instead of a plus.
+
+```         
+whr_tests_hw %>%
+  filter(Region == "Central and Eastern Europe" | 
+           Region == "Western Europe" | 
+           Region == "Latin America and Caribbean") %>%
+  aov(Life_Ladder ~ Region * as.factor(Year), data = .) -> aov_model4
+summary(aov_model4)
+```
+
+```         
+##                         Df Sum Sq Mean Sq F value              Pr(>F)    
+## Region                   2  273.0  136.51 274.254 <0.0000000000000002 ***
+## as.factor(Year)         11    6.8    0.62   1.244               0.254    
+## Region:as.factor(Year)  22   15.0    0.68   1.366               0.123    
+## Residuals              659  328.0    0.50                                
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+We see that in the second case we have another line – Region:Year. This is precisely the interaction of two factors. And it is, by the way, significant! That is, the assumption that different regions have different dynamics of changes in the level of happiness by year is correct.
+
+Next, to determine what exactly was significant, we do post-hocs.
+
+```         
+TukeyHSD(aov_model3, conf.level=.95)
+TukeyHSD(aov_model4, conf.level=.95)
+```
+
+I won’t draw a table – it turns out to be monstrous because we took the years, and they start from 2005: imagine how many pairwise comparisons there are…
+
+#### 14.13.1.4 Repeated Measures ANOVA
+
+Actually, the year variable is a within-group factor. And to be honest, it is not very good to take it into account in the same way as the Region factor, otherwise we will lose a lot of information. In R, ANOVA with repeated measures can be done by specifying additional parameters in the aov() function, or with the already familiar ezANOVA() function, or with the very similar anova_test() function.
+
+```         
+whr_tests_hw %>%
+  filter(Region == "Central and Eastern Europe" | 
+           Region == "Western Europe" | 
+           Region == "Latin America and Caribbean") %>%
+  filter(Year > 2010) %>% #возьму года после 2010, чтобы было поменьше
+  drop_na(Life_Ladder, Year) %>% #удаляю пропущенные значения в интересующих меня колонках
+  aov(Life_Ladder ~ Year + Error(Country/Year), .) %>%
+  summary()
+```
+
+```         
+## Warning in aov(Life_Ladder ~ Year + Error(Country/Year), .): Error() model is
+## singular
+```
+
+```         
+## 
+## Error: Country
+##           Df Sum Sq Mean Sq F value Pr(>F)
+## Year       1   8.94   8.935   2.095  0.152
+## Residuals 71 302.81   4.265               
+## 
+## Error: Country:Year
+##           Df Sum Sq Mean Sq F value Pr(>F)
+## Year       1  0.003  0.0027    0.01  0.919
+## Residuals 70 18.106  0.2586               
+## 
+## Error: Within
+##            Df Sum Sq Mean Sq F value Pr(>F)
+## Residuals 270  12.92 0.04784
+```
+
+How to set this formula: If a factor appears several times for the same subject or country in this case, then the formula for writing it will be as follows `dependent var ~ independen var + Error(ID/independen var)`
+
+The anova_test function has a more human syntax, but it is very sensitive to data, and for example, it was not built on these data. *Later I realized why: I forgot to check for the identity of the variances, so the model does not converge! But I am too lazy to rewrite it.*
+
+```         
+whr_tests_hw %>%
+  filter(Region == "Central and Eastern Europe" | 
+           Region == "Western Europe" | 
+           Region == "Latin America and Caribbean") %>%
+  filter(Year > 2010) %>%
+  drop_na(Life_Ladder, Year) %>% 
+  ezANOVA(., dv = Life_Ladder, wid = Country, within = as.factor(Year))
+```
+
+### 14.13.2 Reshaping
+
+Sometimes, for repeated measures tests, some functions accept data in a different format as input. For example, this is exactly what happened in Jamovi. Notice how our repeated measures data looks now: we have a column `Year`that lists the years, and a column `Life_Ladder`that lists the values ​​corresponding to those years.
+
+```         
+whr_tests_hw %>% 
+  select(Country, Year, Life_Ladder) %>% 
+  filter(Year>2010) %>% 
+  head() #выводит заголовок таблички, первые 10 строк
+```
+
+```         
+## # A tibble: 6 × 3
+##   Country  Year Life_Ladder
+##   <chr>   <dbl>       <dbl>
+## 1 Denmark  2016        7.56
+## 2 Denmark  2011        7.79
+## 3 Denmark  2012        7.52
+## 4 Denmark  2013        7.59
+## 5 Denmark  2014        7.51
+## 6 Denmark  2015        7.51
+```
+
+This data format is called *long* (no joke, that's what it's called!) because the data is stretched out in length, instead of each row consisting of unique data (pay attention to the column `Country`- there are repeating values ​​there, because we have many measurements in different years for each country). Sometimes it is necessary to convert the data to *a wide* format - so that the values ​​in the rows do not repeat, but instead of two columns, we have a column with measurements `Life_Ladder`for each year. This transformation is called data reshaping, as if changing their shape. You can convert the data type from long to wide format or back using the pivot_wider pivot_longer functions. Unfortunately, reshaping is not implemented in Jamovi.
+
+```         
+whr_tests_hw %>% 
+  select(Country, Year, Life_Ladder) %>% 
+  filter(Year>2010) %>% 
+  pivot_wider(names_from = Year, values_from = Life_Ladder) %>% 
+  head()
+```
+
+```         
+## # A tibble: 6 × 7
+##   Country     `2016` `2011` `2012` `2013` `2014` `2015`
+##   <chr>        <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>
+## 1 Denmark       7.56   7.79   7.52   7.59   7.51   7.51
+## 2 Switzerland   7.46  NA      7.78  NA      7.49   7.57
+## 3 Iceland       7.51  NA      7.59   7.50  NA      7.50
+## 4 Norway        7.60  NA      7.68  NA      7.44   7.60
+## 5 Finland       7.66   7.35   7.42   7.44   7.38   7.45
+## 6 Canada        7.24   7.43   7.42   7.59   7.30   7.41
+```
+
+## 14.14 Assignments after the seminar 6
+
+Test several hypotheses on the dataset `whr_tests_hw`using ANOVA and linear regression analysis: select variables suitable for these tests, formulate a hypothesis, formulateH0H0AndH1H1, select levelaa, (if necessary, preprocess the data), check the assumptions for the tests.
+
+1.  Select appropriate variables, formulate a meaningful hypothesis, and test it using one-way ANOVA. Interpret the results: was the hypothesis confirmed?
+
+2.  Select appropriate variables, formulate a meaningful hypothesis and test it with a multivariate ANOVA. Interpret the results: was the hypothesis confirmed?
+
+3.  Select appropriate variables, formulate a meaningful hypothesis, and test it using repeated measures ANOVA. Interpret the results: was the hypothesis supported?
+
+4.  Conduct the same tests of hypotheses 1-3 using linear regression analysis.
+
+## 14.15 Linear Regression Analysis
+
+Now let's move on to one of the most important methods in data analysis, including psychological ones - [linear regression](https://elenary.github.io/StatsForDA/stats_criteria_linear.html#linreg) . First of all, we need to remember when this method is used - and it is used when both the PP and the NP are quantitative. When we talked about correlations, we discussed that this is a simplified version of linear regression, when we have only one NP. For one NP, we can do both a correlation test and a regression analysis, but when there are two or more quantitative NPs, we only need regression. We also discussed that ANOVA is actually a subtype of linear regression, if we move from quantitative NPs to categorical ones! But first things first, let's start with quantitative NPs, a more classic case of linear regression.
+
+Before we build a regression model, we need to check [the assumptions for linear regression](https://elenary.github.io/StatsForDA/stats_criteria_linear.html#assumptions_linreg)
+
+Note that we are not so interested in how normally the salaries are distributed! This is the power of linear regression, that it is robust to salaries of different distributions. But another assumption regarding the distribution of data by salaries is the linearity between the NP and the salaries on which we want to build the model, we need to make sure that there is a linear relationship between them (and not a hole in a donut or a gnome-shaped entity). This is the first assumption.
+
+I chose for analysis the hypothesis that the level of happiness according to the subjective position on the ladder `Life_Ladder`depends on the parameters `Log_GDP_per_capita`(purchasing power, GDP per capita), `Social_support`, `Freedom_to_make_life_choices`,`Perceptions_of_corruption.`
+
+Let's test the assumption of a linear relationship between Life_Ladder salary and several potential variables that I have selected for analysis.
+
+```         
+whr_tests_hw %>% 
+  ggplot(aes(x = Log_GDP_per_capita, y = Life_Ladder)) +
+  geom_point(color = "#355C7D", size = 1) +
+  theme_minimal()
+```
+
+```         
+## Warning: Removed 15 rows containing missing values (`geom_point()`).
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-82-1.png)
+
+```         
+whr_tests_hw %>% 
+  ggplot(aes(x = Social_support, y = Life_Ladder)) +
+  geom_point(color = "#355C7D", size = 1) +
+  theme_minimal()
+```
+
+```         
+## Warning: Removed 12 rows containing missing values (`geom_point()`).
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-82-2.png)
+
+```         
+whr_tests_hw %>% 
+  ggplot(aes(x = Freedom_to_make_life_choices, y = Life_Ladder)) +
+  geom_point(color = "#355C7D", size = 1) +
+  theme_minimal()
+```
+
+```         
+## Warning: Removed 28 rows containing missing values (`geom_point()`).
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-82-3.png)
+
+```         
+whr_tests_hw %>% 
+  ggplot(aes(x = Perceptions_of_corruption, y = Life_Ladder)) +
+  geom_point(color = "#355C7D", size = 1) +
+  theme_minimal()
+```
+
+```         
+## Warning: Removed 78 rows containing missing values (`geom_point()`).
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-82-4.png)
+
+I see that the Log_GDP_per_capita variable shows a very good linear relationship, the Freedom_to_make_life_choices variable is close to this. I don't really like the Social_support variable, but I can try to transform it in the process, but the Perceptions_of_corruption variable looks frankly bad, I'll take it as an anti-example.
+
+### 14.15.1 Linear Regression with One Predictor (Factor)
+
+I will build a model with one factor to begin with – Log_GDP_per_capita. The model is built using the lm() function, to display the main information about the model you need to display summary(). By the way, you can also display these results immediately as ANOVA – this is all because, in fact, this is a subspecies of the same linear regression, and if we like the ANOVA table, we can get it by simply applying the functions to the anova() model
+
+```         
+whr_tests_hw %>% 
+  lm(Life_Ladder ~ Log_GDP_per_capita, .) -> lm_model1
+# напомнию, что точка означает, что именно в этом месте нужно передать в функцию данные
+# полученные на предыдущей строчке пайпа. Посмотрите структуру функции lm() в справке, 
+# на этом находится аргумент `data = `
+lm_model1
+```
+
+```         
+## 
+## Call:
+## lm(formula = Life_Ladder ~ Log_GDP_per_capita, data = .)
+## 
+## Coefficients:
+##        (Intercept)  Log_GDP_per_capita  
+##            -1.4066              0.7421
+```
+
+```         
+summary(lm_model1)
+```
+
+```         
+## 
+## Call:
+## lm(formula = Life_Ladder ~ Log_GDP_per_capita, data = .)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.26515 -0.47805 -0.04913  0.54993  2.01866 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value            Pr(>|t|)    
+## (Intercept)         -1.4066     0.1467  -9.587 <0.0000000000000002 ***
+## Log_GDP_per_capita   0.7421     0.0158  46.973 <0.0000000000000002 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.7016 on 1404 degrees of freedom
+##   (15 observations deleted due to missingness)
+## Multiple R-squared:  0.6111, Adjusted R-squared:  0.6109 
+## F-statistic:  2206 on 1 and 1404 DF,  p-value: < 0.00000000000000022
+```
+
+```         
+anova(lm_model1)
+```
+
+```         
+## Analysis of Variance Table
+## 
+## Response: Life_Ladder
+##                      Df  Sum Sq Mean Sq F value                Pr(>F)    
+## Log_GDP_per_capita    1 1086.07 1086.07  2206.5 < 0.00000000000000022 ***
+## Residuals          1404  691.07    0.49                                  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```         
+# options(scipen = 999) функция, которая отключает нотацию записи чисел через экспоненту
+```
+
+In general, we can already begin to interpret the results of the model, but it is still too early - first we need to make sure that the variances of the residuals are equal, that is, that the assumption of *homoscedasticity* (homogeneity) of the variances is met. This is easiest to check by displaying the first of four graphs that are displayed if you pass the linear model to the basic plot() function.
+
+```         
+plot(lm_model1, 1)
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-84-1.png)
+
+We can make the graph prettier using ggplot(). To do this, we will use the fact that the result of executing lm() is a list containing many different data, including both the model residuals and the predicted values ​​separately.
+
+```         
+head(lm_model1$residuals) #head() выводит заголовок, первые элементы
+```
+
+```         
+##         1         2         3         4         5         6 
+## 0.9974072 1.4818864 1.2677150 1.4125433 1.1663137 1.2430108
+```
+
+```         
+head(lm_model1$fitted.values)
+```
+
+```         
+##        1        2        3        4        5        6 
+## 6.560375 6.537048 6.566518 6.558349 6.517045 6.527505
+```
+
+```         
+ggplot(lm_model1, aes(x = lm_model1$fitted.values, y = lm_model1$residuals)) +
+  geom_point(color = "#355C7D", size = 1) +
+  theme_minimal()
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-86-1.png) Let's recall the examples of diagnostic graphs that we discussed last semester Examples of diagnostic graphs for residuals: <https://gallery.shinyapps.io/slr_diag/> A graph is considered good if, when moving from left to right, all the points are distributed approximately evenly. But if we have a broom, that on one side the data has shrunk to one point, and then they start to diverge like a broom - this means that *heteroscedasticity* is observed in the data , they are not homogeneous, and the results of such a model will not be very reliable. In our case, the graph looks good and passes the test.
+
+Now let's take an anti-example and see what happens to the distribution of the residuals.
+
+```         
+whr_tests_hw %>% 
+  lm(Life_Ladder ~ Perceptions_of_corruption, .) -> lm_model2_anti
+plot(lm_model2_anti, 1)
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-87-1.png)
+
+Something went wrong here, so we wouldn’t rely on such a model.
+
+The next assumption is that the residuals must be normally distributed. Yes, we do not check for normality of the PP distribution, but the residuals need to be checked - otherwise we will not be able to draw a line with the least squares method calculation, that is, trying to get closer to all our points at once. Let's check this assumption by displaying the second graph of the standard plot() function.
+
+```         
+plot(lm_model1, 2)
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-88-1.png) Or, as we have already built beautiful graphs to check normality using ggplot
+
+```         
+ggplot(data = lm_model1, aes(x = lm_model1$residuals)) +
+  geom_density(color = "#355C7D") +
+  theme_minimal()
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-89-1.png)
+
+```         
+ggplot(data = lm_model1, aes(sample = lm_model1$residuals)) +
+  stat_qq(color = "#355C7D") +
+  geom_qq_line() +
+  theme_minimal()
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-89-2.png)
+
+So, we have met all the assumptions for the single predictor model! We only have the assumption of no multicollinearity left, but it is not applicable to the single predictor model.
+
+Now let's look again at the model results and remember [how to interpret them](https://elenary.github.io/StatsForDA/stats_criteria_linear.html#linreg_example) . The key thing we are interested in is [the linear regression coefficients](https://elenary.github.io/StatsForDA/stats_criteria_linear.html#linreg_coef) ,b0b0, intercept, the intersection of the regression line with the y-axis, andb1b1, slope, the angle of inclination of the line - since [the null hypothesis for linear regression](https://elenary.github.io/StatsForDA/stats_criteria_linear.html#linreg_null) is that they are equal to zero. Another equally important thing isR2R2, [the coefficient of determination and the percentage of explained variance](https://elenary.github.io/StatsForDA/stats_criteria_linear.html#rsquared) .
+
+```         
+lm_model1
+```
+
+```         
+## 
+## Call:
+## lm(formula = Life_Ladder ~ Log_GDP_per_capita, data = .)
+## 
+## Coefficients:
+##        (Intercept)  Log_GDP_per_capita  
+##            -1.4066              0.7421
+```
+
+```         
+summary(lm_model1)
+```
+
+```         
+## 
+## Call:
+## lm(formula = Life_Ladder ~ Log_GDP_per_capita, data = .)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.26515 -0.47805 -0.04913  0.54993  2.01866 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value            Pr(>|t|)    
+## (Intercept)         -1.4066     0.1467  -9.587 <0.0000000000000002 ***
+## Log_GDP_per_capita   0.7421     0.0158  46.973 <0.0000000000000002 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.7016 on 1404 degrees of freedom
+##   (15 observations deleted due to missingness)
+## Multiple R-squared:  0.6111, Adjusted R-squared:  0.6109 
+## F-statistic:  2206 on 1 and 1404 DF,  p-value: < 0.00000000000000022
+```
+
+As usual, we look at the p-value of each coefficient (and we can also look at the p-value of the entire model: here the same story as with ANOVA - the entire model is significant when at least one of the coefficients is significant, and is not significant when all coefficients do not differ statistically significantly from zero). If the coefficient is significant, then we can say that it significantly contributes to the explanation of the variance.b0b0, the intercept, is significantly different from zero, so we can say that our line will not start at the origin, but will be shifted by -1.4 along the y-axis.b1b1Log_GDP_per_capita is significantly different from zero, so our line will have a slope - which means that with an increase in Log_GDP_per_capita by 1, the dependent variable Life_Ladder will increase by 0.74!
+
+What is it equal to?R2R2? It is equal to 0.61, which is a very good result. That is, 61% of the variability of our data at the Life_Ladder level is determined by the level of purchasing power Log_GDP_per_capita!
+
+I can now write the equation of the regression line as follows:
+
+^Lifand_Laddandr=−1.4+0.74×Ltheg_GDP_pandr_capitaL^ifand_Laddandr=−1.4+0.74×Ltheg_GDP_pandr_capita
+
+Let's now visualize our regression line
+
+```         
+whr_tests_hw %>% 
+  ggplot(aes(x = Log_GDP_per_capita, y = Life_Ladder)) +
+  geom_point(color = "#355C7D", size = 1, alpha = 0.5) +
+  geom_smooth(method = 'lm', color = "violet") +
+  theme_minimal()
+```
+
+```         
+## Warning: Removed 15 rows containing non-finite values (`stat_smooth()`).
+```
+
+```         
+## Warning: Removed 15 rows containing missing values (`geom_point()`).
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-91-1.png)
+
+Beauty!
+
+### 14.15.2 Linear Regression with Multiple Predictors (Factors)
+
+Everything is the same, but now we will take the second predictor into the model – Freedom_to_make_life_choices.
+
+```         
+whr_tests_hw %>%
+  lm(Life_Ladder ~ Log_GDP_per_capita + Freedom_to_make_life_choices, .) -> lm_model3_multy
+lm_model3_multy
+```
+
+```         
+## 
+## Call:
+## lm(formula = Life_Ladder ~ Log_GDP_per_capita + Freedom_to_make_life_choices, 
+##     data = .)
+## 
+## Coefficients:
+##                  (Intercept)            Log_GDP_per_capita  
+##                      -2.0948                        0.6478  
+## Freedom_to_make_life_choices  
+##                       2.1544
+```
+
+```         
+summary(lm_model3_multy)
+```
+
+```         
+## 
+## Call:
+## lm(formula = Life_Ladder ~ Log_GDP_per_capita + Freedom_to_make_life_choices, 
+##     data = .)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.50100 -0.43131  0.02093  0.44158  1.83176 
+## 
+## Coefficients:
+##                              Estimate Std. Error t value            Pr(>|t|)
+## (Intercept)                  -2.09478    0.14063  -14.90 <0.0000000000000002
+## Log_GDP_per_capita            0.64781    0.01562   41.46 <0.0000000000000002
+## Freedom_to_make_life_choices  2.15438    0.12663   17.01 <0.0000000000000002
+##                                 
+## (Intercept)                  ***
+## Log_GDP_per_capita           ***
+## Freedom_to_make_life_choices ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.6403 on 1375 degrees of freedom
+##   (43 observations deleted due to missingness)
+## Multiple R-squared:  0.6791, Adjusted R-squared:  0.6787 
+## F-statistic:  1455 on 2 and 1375 DF,  p-value: < 0.00000000000000022
+```
+
+Checking is allowed
+
+```         
+plot(lm_model3_multy, 1)
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-93-1.png)
+
+```         
+plot(lm_model3_multy, 2)
+```
+
+![](https://elenary.github.io/StatsForDA/StatsForDA_files/figure-html/unnamed-chunk-93-2.png)
+
+Now we need to check the assumption about the absence of multicollinearity - that there is no strong correlation between the predictors (NP), otherwise our model will be a bit meaningless. We will check using the vif() function, the dispersion inflation coefficient. The indicators are quite arbitrary, but it is considered that if the values ​​are greater than 5, then this is a very strong correlation between the variables, and the strongly correlated variable should be removed.
+
+```         
+car::vif(lm_model3_multy)
+```
+
+```         
+##           Log_GDP_per_capita Freedom_to_make_life_choices 
+##                     1.153419                     1.153419
+```
+
+Our vif readings are quite low, so we won't change anything.
+
+Next we can interpret the results (all coefficients are significant) and write down the equation of the regression line.
+
+^Lifand_Laddandr=−2.09+0.64×Ltheg_GDP_pandr_capita+2.15×Frandanddthem_tthe_makand_lifand_chtheicandsL^ifand_Laddandr=−2.09+0.64×Ltheg_GDP_pandr_capita+2.15×Frandanddthem_tthe_makand_lifand_chtheicands
+
+## 14.16 Assignments after the seminar 7
+
+1.  Select variables suitable for linear regression in the data`whr_tests_hw.csv`
+
+2.  Construct a linear regression on these variables, with one factor (LF)
+
+3.  Construct a linear regression on these variables, but with at least two factors (NP)
+
+4.  Plot diagnostic plots for each model: how equal is the variance of the residuals for these models? Can we trust the results of these models?
+
+5.  Determine which model best explains the data (i.e. wage variability)?
+
+6.  Write the linear regression equation for both models.
+
+## 14.17 Logistic Regression
+
+Let's move from linear regression to [logistic](https://elenary.github.io/StatsForDA/stats_criteria_categ.html#logreg) regression. First, let's remember what this method is and when it is used - it is used when the salary is not quantitative, but categorical, and, as a rule, has two gradations. This is the most classic case of logistic regression, although the salary in it can have more gradations than two - then it will be *a multinomial logistic regression* . All machine learning is built on log regression - tasks in which it is necessary to determine whether an image belongs to a certain pattern (for example, text recognition), whether a credit borrower is reliable for issuing a loan (scoring models in banks), etc. use this method.
+
+We will consider it on the same example of our data from the World Happiness Report. They are not very suitable for this method, so the task will be a bit artificial - we will try to predict whether a country will be in the first or second half of the rating by level of happiness (we created a special variable for this). First, I will recode this variable into 1 and 0, since log regression works with numerical values ​​0 and 1.
+
+```         
+whr_tests_hw %>%
+  mutate(mean_position_bi = ifelse(mean_position == "upper", 1, 0)) -> whr_tests_hw
+```
+
+First, let's build the simplest model, which will include only the intercept. This model is essentially an analogue of chi-square - without any predictors, estimate whether a country will be in the first or second half of the rating, purely based on the frequency of occurrence of countries from the first and second halves? Specifically, in this example, the frequencies will be approximately the same, but the principle of operation of this model is approximately the same.
+
+```         
+table(whr_tests_hw$mean_position)
+```
+
+```         
+## 
+## lower upper 
+##    78    75
+```
+
+```         
+whr_tests_hw %>%
+  glm(mean_position_bi ~ 1, data = ., family = binomial) -> lm_model_log1
+summary(lm_model_log1)
+```
+
+```         
+## 
+## Call:
+## glm(formula = mean_position_bi ~ 1, family = binomial, data = .)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -1.161  -1.161  -1.161   1.194   1.194  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(>|z|)
+## (Intercept) -0.03922    0.16172  -0.243    0.808
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 212.04  on 152  degrees of freedom
+## Residual deviance: 212.04  on 152  degrees of freedom
+##   (1268 observations deleted due to missingness)
+## AIC: 214.04
+## 
+## Number of Fisher Scoring iterations: 3
+```
+
+```         
+log(75/78)
+```
+
+```         
+## [1] -0.03922071
+```
+
+```         
+# log(p/1-p) = intercept
+```
+
+Let's complicate the model and add GDP per capita as a predictor
+
+```         
+whr_tests_hw %>%
+  glm(mean_position_bi ~ Log_GDP_per_capita, ., family = binomial) -> lm_model_log2
+summary(lm_model_log2)
+```
+
+```         
+## 
+## Call:
+## glm(formula = mean_position_bi ~ Log_GDP_per_capita, family = binomial, 
+##     data = .)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.9946  -0.4687  -0.0601   0.5165   2.1031  
+## 
+## Coefficients:
+##                    Estimate Std. Error z value       Pr(>|z|)    
+## (Intercept)        -21.8266     3.5703  -6.113 0.000000000976 ***
+## Log_GDP_per_capita   2.3186     0.3758   6.169 0.000000000685 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 207.84  on 149  degrees of freedom
+## Residual deviance: 109.90  on 148  degrees of freedom
+##   (1271 observations deleted due to missingness)
+## AIC: 113.9
+## 
+## Number of Fisher Scoring iterations: 6
+```

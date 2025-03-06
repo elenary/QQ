@@ -62,9 +62,9 @@ Distribution graphs, in fact, already give us a lot - at least an understanding 
 
 **The asymmetry coefficient, or “skewness”,** is an indicator of the symmetry of the graph: if the graph is symmetrical6, this indicator is equal to 0; if not, it has a value different from zero in the direction in which the graph is skewed.
 
--   If the asymmetry coefficient is positive,S>0S>0– they talk about **right-sided assimilation** (the right side is more elongated than the left).
+-   If the asymmetry coefficient is positive,S\>0S\>0– they talk about **right-sided assimilation** (the right side is more elongated than the left).
 
--   If the asymmetry coefficient is negative,S<0S<0– they talk about **left-sided assimilation** (the left side is more elongated than the right).
+-   If the asymmetry coefficient is negative,S\<0S\<0– they talk about **left-sided assimilation** (the left side is more elongated than the right).
 
 **Excess, “stretching” (kurtosis)** is an indicator of how much the graph is stretched upward or “flattened” along the abscissa axis.
 
@@ -84,7 +84,7 @@ The point is that per capita income is a very uneven indicator (variable). <http
 
 ### Mean, median, mode
 
-**The arithmetic mean (mean)** is the sum of all values divided by the number of observations. It is calculated using the formula 
+**The arithmetic mean (mean)** is the sum of all values divided by the number of observations. It is calculated using the formula
 
 $\bar X = \dfrac{\sum_{i=1}^{n}x_i}{n}$
 
@@ -111,7 +111,6 @@ It is useful to remember the properties of the average:
 2.  If each sample value is multiplied (or divided) by the same number, then the average will also increase (or decrease) by the same number of times.¯$\bar X_(x_i \times c) = \bar X \times c$
 
 3.  The sum of all deviations from the mean is zero. $\sum_{i=1}^{n}(\bar X - x_i) = 0$
-
 
 **The median** is the boundary that divides an ordered set of data into two. To calculate the median, we need to: 1) arrange all the available values in ascending order; 2) find the middle: this will be either the value corresponding to the place $\frac{n}{2}+1$, if n is odd, or the average of two central values $(\frac{1}{2}(X_{n/2}+X_{n+1})/2$, if n is even.
 
@@ -160,7 +159,7 @@ Square mean.
 In the welfare valuation example, we found that the mean is a poor choice for describing these data using measures of central tendency. So which measures of central tendency should we choose?
 
 | **Measure of CT** | **Data and scale** | **Features of use** |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | Average | Quantitative only: ratio or interval scale | a fairly large sample, the distribution is symmetrical, there are no noticeable outliers |
 | Median | Quantitative or ordinal: ratio scale, interval or ordinal (rank) scale | we can use it when the distribution is not symmetrical, there are outliers, we cannot use it for the nominative scale |
 | Fashion | Any scale, Nominal, Ordinal, Quantitative (ratio or interval) | most often used where we cannot perform metric operations, but cannot accurately calculate the mode for continuous quantities |
@@ -213,6 +212,7 @@ ggplot(NULL, aes(asymm_right)) +
        y = 'Density') +
   theme_minimal()
 ```
+
 ------------------------------------------------------------------------
 
 We have come close to the concepts that can be (and we will be) directly applied to the data. To make these concepts close to reality, we will take a real dataset (collected data) on which we will work further. As an example, we will take a dataset from kaggle <https://www.kaggle.com/datasets/uciml/student-alcohol-consumption> . This is data from two Portuguese schools (more likely colleges) with detailed socio-demographic information about students, including how they study in mathematics and Portuguese and how often they drink alcohol. I took this dataset, because it contains variables of different types of data on different scales (both a relationship scale, such as age, and an ordinal scale, such as ratings of mother's or father's education or support in the family).
@@ -250,24 +250,23 @@ students %>%
   theme_minimal()
 ```
 
-
 ```{r}
 table(students$age)
 prop.table(table(students$age))
 # round(prop.table(table(students$age, students$Walc), 1), 2)
 ```
 
-
 ```{r}
 mean(students$age)
 ```
+
 ```{r}
 median(students$age)
 ```
+
 ```{r}
 mode(students$age)
 ```
-
 
 ```{r}
 students %>% 
@@ -275,6 +274,7 @@ students %>%
   geom_density() +
   theme_minimal()
 ```
+
 ```{r}
 mean(students$G_mat)
 ```
@@ -283,12 +283,12 @@ mean(students$G_mat)
 median(students$G_mat)
 ```
 
-
 ```{r}
 table(students$Mjob)
 prop.table(table(students$Mjob))
 mode(students$Mjob)
 ```
+
 ## Quantiles, quartiles and percentiles
 
 We have found out that the median divides the distribution in half. This is convenient. For example, to estimate below / above what value the first or second half of the data is.
@@ -312,9 +312,11 @@ It turns out that:
 ```         
 knitr::include_graphics("docs/images/quartiles-2.png")
 ```
+
 ```{r fig.align = 'center', out.width="60%"}
 knitr::include_graphics("images/quartiles-2.png")
 ```
+
 ## Measures of variability (variability)
 
 In addition to measures of central tendency, there are measures of variability, also known as measures of changeability or dispersion. Variability is the variability of values, how much the data differs from observation to observation within the sample.
@@ -367,6 +369,7 @@ rnorm_three %>%
   scale_x_continuous(breaks = -5:15) +
   theme_minimal()
 ```
+
 ### Range, standard deviation and variance
 
 **Range** is the difference between the maximum and minimum values in a sample $x_{max}-x_{min}$
@@ -394,7 +397,7 @@ An important point is the formula for the dispersion for the general population.
 
 Just like the mean, there are important properties for the variance/standard deviation
 
-1.  If the same number (constant) is added (or subtracted) from each sample value  $c$, then the dispersion and standard deviation will not change: $D_(x_i+c) = D$, $sd_(x_i+c) = sd$
+1.  If the same number (constant) is added (or subtracted) from each sample value $c$, then the dispersion and standard deviation will not change: $D_(x_i+c) = D$, $sd_(x_i+c) = sd$
 
 2.  If each sample value is multiplied (or divided) by the same numbercc, then the dispersion will increase (decrease) in $c^2$ times $D_(x_i \times c) = D \times c^2$, and the average will increase (or decrease) in $c$ times: $sd_(x_i \times c) = sd \times c$
 
@@ -418,18 +421,22 @@ sd(students$Walc)
 **Interquartile range**
 
 ## Boxplot and Violinplot
-<p align="center"> 
+
+<p align="center">
+
 ```{r fig.align = 'center', out.width="60%"}
 # knitr::include_graphics("docs/images/Boxplot_vs_PDF.png")
 ```
+
 </p>
 
-<p align="center"> 
+<p align="center">
+
 ```{r fig.align = 'center', out.width="60%"}
 # knitr::include_graphics("docs/images/boxplots_hist.png")
 ```
-</p>
 
+</p>
 
 ```{r, eval=TRUE}
 library(viridis)
