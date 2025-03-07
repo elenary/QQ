@@ -8,14 +8,14 @@ str(whr)
 
 whr$`Happiness Score`
 
-# data structures (vectors) and data types --------------------------------------------------
+# vectors and data types --------------------------------------------------
 
 
 vec1 <- c(3, 6, 1, 10) #numeric vector
 vec2 <- c("blue", "orange", "yellow", "gray") #character vector
 vec3 <- c(TRUE, FALSE, TRUE, FALSE) #logical vector
 vec4 <- c(NA, NA, NA, NA) #NA -- not available
-NA == 0 
+NA == 1 
 NA == "NA" 
 NA == NA
 
@@ -24,7 +24,7 @@ RT <- c(5.34, 7.34, 6.45, NA)
 c(3, TRUE, "blue") #data types transformation
 c(3, TRUE, FALSE, 5) #data types transformation
 
-# character > numeric > logical
+character > numeric > logical
 
 data1 <- data_frame(vec1, vec2, vec3, vec4, RT)
 
@@ -43,13 +43,14 @@ max(whr$`Happiness Score`)
 range(whr$`Happiness Score`)
 
 hist(whr$`Happiness Score`)
+# lines(density(whr$`Happiness Score`))
 
 summary(whr$`Happiness Score`)
 
 
 # filtering rows and selection columns ----------------------------------------------------------
 
-#logical operators are:
+#logical operators
 # >, < , ==, !=
 # = <- 
 # & -- logical AND
@@ -89,7 +90,6 @@ a <- 5
 b <- 7
 
 # ifelse(logical expression, what should R show if it is true, what if it is false)
-
 ifelse(a > b, "a greater than b", "b greater than a")
 
 
@@ -112,52 +112,16 @@ whr %>%
   View()
 
 
-# second dataset with NA loading ------------------------------------------
-
-library(tidyverse)
+# NA ----------------------------------------------------------------------
 
 whr2 <- read_csv("2016-2.csv")
-# whr2 = read_csv("2016-2.csv") # alternative way to assign smth to variable name
-# read_csv("2016-2.csv") -> whr2 # arrow direction always point to variable name
 
-whr2 <- read_csv("https://raw.githubusercontent.com/elenary/StatsForDA/main/2016-2.csv")
-
-View(whr2)
-
-# NA processing----------------------------------------------------------------------
-  
 str(whr2$`Happiness Score`)
 
-#descriprives stats
-
 mean(whr2$`Happiness Score`, na.rm = TRUE)
-median(whr2$`Happiness Score`, na.rm = TRUE)
 sd(whr2$`Happiness Score`, na.rm = TRUE)
-range(whr2$`Happiness Score`, na.rm = TRUE)
+sum(whr2$`Happiness Score`, na.rm = TRUE)
 
-#other way to calculate descriptive stats inside pipe (with filtering data before)
-whr2 %>% 
-  filter(Region == "Western Europe" | Region == "Latin America and Caribbean") %>% 
-  select(`Happiness Score`) %>% #still dataframe
-  pull() %>% 
-  mean(na.rm = TRUE)
-
-whr2 %>% 
-  filter(Region == "Western Europe") %>% 
-  select(`Happiness Score`) %>% #still dataframe
-  pull() %>% 
-  mean(na.rm = TRUE)
-
-whr2 %>% 
-  drop_na() %>% #drop all rows if there is at least one NA
-  select(`Happiness Score`) %>% #still dataframe
-  pull() %>% 
-  mean()
-
-whr2 %>% 
-  drop_na() %>%
-  View()
-  
 whr2 %>% 
   filter(Region == "Middle East and Northern Africa") %>% 
   select(`Happiness Score`) %>% 
@@ -172,20 +136,9 @@ whr2 %>%
 
 hist(whr$`Happiness Score`)
 
-whr %>% 
-  ggplot(aes(x = `Happiness Score`)) +
-  geom_histogram() +
-  theme_minimal()
-
-whr %>% 
+whr2 %>% 
   ggplot(aes(x = `Happiness Score`)) +
   geom_histogram(bins = 20) +
-  theme_minimal()
-
-whr %>% 
-  ggplot(aes(x = `Happiness Score`)) +
-  geom_density(fill = "red", alpha = 0.3,
-               color = "purple", linetype = "dashed", linewidth = 4) +
   theme_minimal()
 
 whr2 %>% 
@@ -193,71 +146,120 @@ whr2 %>%
   geom_density(fill = "green", alpha = 0.5,
                color = "pink", size = 5, linetype = "dashed") +
   theme_minimal()
-
-whr %>% 
+  
+whr2 %>% 
   filter(Region == "North America" | Region == "Latin America and Caribbean") %>% 
   ggplot(aes(y = `Trust (Government Corruption)`, fill = Region)) +
   geom_boxplot() +
   theme_minimal()
-  
-  
-# correlation -------------------------------------------------------------
 
-#looking at the variables disctributions
+
+# correlation ------------------------------------------------------------
+
+mean(whr$`Trust (Government Corruption)`)
+median(whr$`Trust (Government Corruption)`)
+
+summary(whr$`Trust (Government Corruption)`)
+install.packages("skimr")
+# library(skimr)
+
+skimr::skim(whr$`Trust (Government Corruption)`)
+
 whr %>% 
-  ggplot(aes(x = `Health (Life Expectancy)`)) +
+  ggplot(aes(x = `Trust (Government Corruption)`)) +
   geom_density() +
   theme_minimal()
 
 whr %>% 
-  ggplot(aes(sample = `Health (Life Expectancy)`)) +
+  ggplot(aes(sample = `Trust (Government Corruption)`)) +
   geom_qq() +
-  geom_qq_line()+
+  geom_qq_line() +
+  theme_minimal()
+
+skimr::skim(whr$Generosity)
+
+whr %>% 
+  ggplot(aes(x = Generosity)) +
+  geom_density() +
   theme_minimal()
 
 whr %>% 
+  ggplot(aes(sample = Generosity)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
+
+whr %>% 
+  ggplot(aes(x = Generosity, y = `Trust (Government Corruption)`)) +
+  geom_point(size = 1, color = "navy") +
+  theme_minimal()
+
+cor.test(whr$`Trust (Government Corruption)`, whr$Generosity,
+         conf.level = 0.95, method = "spearman")
+
+
+  
+# r = 0.03, p = 0.0045, sample size ~ 100000
+# 
+# r = 0.03, p = 0.3545, sample size: 10-100, false negative
+#                                     ~ 10000, absence in GP
+# 
+# r = 0.34, p =  0.0045, sample size: 10-100
+#   
+# r = 0.34, p = 0.3545, sample size: 10-100 (absence in GP)
+
+
+library(tidyverse)
+
+whr <- read_csv("2016.csv")
+
+table(whr$Region)
+
+whr %>% 
+  select(Country, Region, `Economy (GDP per Capita)`) %>% 
+  View()
+  
+
+whr %>% 
+  filter(Region == "Western Europe" | Region == "Sub-Saharan Africa") %>% 
+  select(Country, Region, `Economy (GDP per Capita)`) -> whr_test
+
+# <-, = -- the same
+
+
+# t test ------------------------------------------------------------------
+
+install.packages("skimr")
+library(skimr)
+
+# skim(whr_test$`Economy (GDP per Capita)`) -- the same as below
+
+whr %>% 
+  filter(Region == "Western Europe" | Region == "Sub-Saharan Africa") %>%
+  select(`Economy (GDP per Capita)`) %>% 
+  skim()
+
+whr_test %>% 
   ggplot(aes(x = `Economy (GDP per Capita)`)) +
-  geom_density() +
+  geom_density(color = "navy", linewidth = 0.5) +
   theme_minimal()
 
-whr %>% 
+whr_test %>% 
+  ggplot(aes(x = `Economy (GDP per Capita)`)) +
+  geom_histogram(color = "navy", linewidth = 0.5) +
+  theme_minimal()
+
+whr_test %>% 
   ggplot(aes(sample = `Economy (GDP per Capita)`)) +
-  geom_qq() +
-  geom_qq_line()+
+  geom_qq(color = "navy", size = 0.5) +
+  geom_qq_line() +
   theme_minimal()
 
-#descriprive stats of variables
+whr_test %>% 
+  wilcox.test(`Economy (GDP per Capita)` ~ Region, ., paired = FALSE,
+              conf.level = 0.95)
 
-summary(whr$`Economy (GDP per Capita)`)
-summary(whr$`Health (Life Expectancy)`)
-
-#scatterplot for assesing relationship between two variables
-
-whr %>% 
-  ggplot(aes(x = `Health (Life Expectancy)`, y = `Economy (GDP per Capita)`))+
-  geom_point(color = "navy", size = 1) +
-  theme_minimal()
-
-#correlation test
-
-options(scipen = 999) #switch off scientific notation to don't have an exponent in p-value
-
-cor.test(whr$`Health (Life Expectancy)`, 
-         whr$`Economy (GDP per Capita)`, conf.level = 0.95,
-         method = "spearman")
-
-  
-  
-
-
-
-
-  
-  
-  
-  
-
-
+options(scipen=999)
 
 
 
