@@ -193,8 +193,8 @@ We see that in the second case we have another line – Region:Year. This is pre
 Next, to determine what exactly was significant, we do post-hocs.
 
 ```{r eval=TRUE, echo = TRUE, message = FALSE}      
-TukeyHSD(aov_model3, conf.level=.95)
-TukeyHSD(aov_model4, conf.level=.95)
+# TukeyHSD(aov_model3, conf.level=.95)
+# TukeyHSD(aov_model4, conf.level=.95)
 ```
 
 I won’t draw a table – it turns out to be monstrous because we took the years, and they start from 2005: imagine how many pairwise comparisons there are…
